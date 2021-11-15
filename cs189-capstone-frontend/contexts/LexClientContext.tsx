@@ -1,23 +1,24 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { LexRuntimeServiceClient } from "@aws-sdk/client-lex-runtime-service";
 
-const LexClientContext = createContext<LexRuntimeServiceClient | null>(null);
+const lexClient = new LexRuntimeServiceClient({
+  region: process.env.NEXT_PUBLIC_AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const LexClientContext = createContext(lexClient);
 
 export const useLexClient = () => {
   const client = useContext(LexClientContext);
-
-  if (client === null) throw new Error("no AWS Lex client");
-
   return client;
 };
 
 export const LexClientProvider = ({ children }) => {
-  const [client] = useState(
-    new LexRuntimeServiceClient({ region: "us-west-2" })
-  );
-
   return (
-    <LexClientContext.Provider value={client}>
+    <LexClientContext.Provider value={lexClient}>
       {children}
     </LexClientContext.Provider>
   );
