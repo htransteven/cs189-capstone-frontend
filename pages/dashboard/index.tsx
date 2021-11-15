@@ -27,6 +27,7 @@ const Index = () => {
     } catch (err) {
       console.log("Error responding to message. ", err);
     }
+    setInput("");
   };
 
   return (
