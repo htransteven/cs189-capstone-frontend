@@ -149,7 +149,9 @@ const MessageTimestamp = styled.span`
   color: ${pallete.chatbot.secondaryText};
   font-size: 0.7rem;
 `;
-const MessagePayload = styled.span<{ fromUser: boolean }>`
+const MessagePayload = styled.pre<{ fromUser: boolean }>`
+  font-family: inherit;
+  white-space: pre-wrap;
   background-color: ${({ fromUser }) =>
     fromUser ? pallete.chatbot.backgroundSecondary : pallete.purple};
   color: ${({ fromUser }) =>
@@ -315,7 +317,6 @@ export const ChatBot = () => {
   };
 
   const handleButtonClick = () => {
-    console.log("2");
     setIsOpen((prev) => !prev);
   };
 

@@ -13,7 +13,6 @@ const LexClientContext = createContext(lexClient);
 
 export const useLexClient = () => {
   const client = useContext(LexClientContext);
-  console.log(client.config.credentials());
   return client;
 };
 
