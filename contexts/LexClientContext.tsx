@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext } from "react";
 import { LexRuntimeServiceClient } from "@aws-sdk/client-lex-runtime-service";
 
 const lexClient = new LexRuntimeServiceClient({
@@ -13,6 +13,7 @@ const LexClientContext = createContext(lexClient);
 
 export const useLexClient = () => {
   const client = useContext(LexClientContext);
+  console.log(client.config.credentials());
   return client;
 };
 

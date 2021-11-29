@@ -322,8 +322,8 @@ export const ChatBot = () => {
   if (typeof window === "undefined") return null;
 
   return ReactDOM.createPortal(
-    <LexClientProvider>
-      <Wrapper>
+    <Wrapper>
+      <LexClientProvider>
         <ChatWindow isOpen={isOpen} ref={containerRef}>
           <ChatForm onSubmit={sendMessage}>
             <ChatHistory ref={chatLogRef}>
@@ -348,8 +348,8 @@ export const ChatBot = () => {
         <Button isOpen={isOpen} onClick={handleButtonClick}>
           {isOpen ? "X" : "B"}
         </Button>
-      </Wrapper>
-    </LexClientProvider>,
+      </LexClientProvider>
+    </Wrapper>,
     document.body
   );
 };
