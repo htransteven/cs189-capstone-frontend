@@ -140,7 +140,7 @@ const MessageMeta = styled.div<{ fromUser: boolean }>`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  justify-content: ${({ fromUser }) => (fromUser ? "flex-start" : "flex-end")};
+  justify-content: ${({ fromUser }) => (fromUser ? "flex-end" : "flex-start")};
   width: 100%;
   margin-bottom: 3px;
 `;
@@ -150,6 +150,7 @@ const MessageTimestamp = styled.span`
   font-size: 0.7rem;
 `;
 const MessagePayload = styled.pre<{ fromUser: boolean }>`
+  margin: 0;
   font-family: inherit;
   white-space: pre-wrap;
   background-color: ${({ fromUser }) =>
@@ -158,8 +159,8 @@ const MessagePayload = styled.pre<{ fromUser: boolean }>`
     fromUser ? pallete.chatbot.primaryText : pallete.white};
   padding: 15px;
   border-radius: ${({ fromUser }) =>
-    fromUser ? "0px 15px 15px 15px" : "15px 0px 15px 15px"};
-  align-self: ${({ fromUser }) => (fromUser ? "flex-start" : "flex-end")};
+    fromUser ? "15px 0px 15px 15px" : "0px 15px 15px 15px"};
+  align-self: ${({ fromUser }) => (fromUser ? "flex-end" : "flex-start")};
   max-width: 80%;
 `;
 
