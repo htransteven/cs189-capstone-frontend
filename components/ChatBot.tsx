@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { pallete } from "../styles";
 import { LexClientProvider, useLexClient } from "../contexts/LexClientContext";
-import { format } from "date-fns";
+import { format, getUnixTime } from "date-fns";
 
 const Wrapper = styled.div`
   position: absolute;
@@ -230,6 +230,7 @@ export const ChatBot = () => {
   const [input, setInput] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [thinking, setThinking] = useState(false);
+  const [userId] = useState(getUnixTime(new Date()));
   const chatLogRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -238,12 +239,12 @@ export const ChatBot = () => {
 
     setChatHistory([
       {
-        message: "Hello and welcome to Scribe! How may I help you?",
+        message: `Hello and welcome to Scribe! Your chat session ID is #${userId}. How may I help you?`,
         sender: "bot",
         timestamp: Date.now(),
       },
     ]);
-  }, [isOpen, chatHistory]);
+  }, [isOpen, chatHistory, userId]);
 
   useEffect(() => {
     if (!chatLogRef.current) return;
@@ -288,7 +289,7 @@ export const ChatBot = () => {
       botAlias: process.env.NEXT_PUBLIC_BOT_ALIAS,
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
       inputText: input,
-      userId: "chatbot-demo-stevno", // For example, 'chatbot-demo'. generate randomly
+      userId: `${userId}`,
     };
     setThinking(true);
     try {
