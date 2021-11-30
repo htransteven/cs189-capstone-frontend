@@ -29,23 +29,31 @@ export default function Home() {
 
   const roleStr = JSON.stringify(user).split(',')[0];
   const role = whatRole(roleStr);
-
   return (
-    <div className="flex flex-col p-5 bg-gray-200">
-      <div className="grid grid-cols-6 gap-4">
-        <div className="col-span-4">
-          <p className="font-mono text-3xl">SCRIBE</p>
+    <div className="min-h-full">
+      <header className="px-5 border-b">
+        <div className="grid grid-cols-6 gap-4 py-4">
+          <h1 className="font-mono text-3xl font-bold text-gray-900">SRIBE</h1>
         </div>
-        <div className="col-span-2 justify-self-end">
-          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-            {/* eslint-disable-next-line */}
-            <a href="/api/auth/logout">Logout</a>
-          </button>
+      </header>
+      <header className="px-5 border-b">
+        <div className="grid grid-cols-6 gap-4 py-4">
+          <div className="col-span-4">
+            <p className="text-md">Hello, {user.name}</p>
+          </div>
+          <div className="col-span-2 justify-self-end">
+            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+              {/* eslint-disable-next-line */}
+              <a href="/api/auth/logout">Logout</a>
+            </button>
+          </div>
         </div>
-      </div>
-      {role == 'Patient' && <PatientHome />}
-      {role == 'Provider' && <ProviderHome />}
-      {role == 'None' && <div>Please contact admin to give you a role</div>}
+      </header>
+      <body className="antialiased bg-gray-200 p-6 h-screen">
+        {role == 'Patient' && <PatientHome />}
+        {role == 'Provider' && <ProviderHome />}
+        {role == 'None' && <div>Please contact admin to give you a role</div>}
+      </body>
     </div>
   );
 }
