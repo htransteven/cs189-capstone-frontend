@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import React from 'react';
+import { useAppContext } from '../contexts/AppContext';
 
 export const ProviderHome = () => {
+  const { patients } = useAppContext();
+
+  console.log(patients);
   return (
     <div className="container mx-auto">
       <div className="flex flex-wrap -mx-4">

@@ -49,11 +49,11 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <body className="antialiased bg-gray-200 p-6 h-screen">
+      <div className="antialiased bg-gray-200 p-6 h-screen">
         {role == 'Patient' && <PatientHome />}
         {role == 'Provider' && <ProviderHome />}
         {role == 'None' && <div>Please contact admin to give you a role</div>}
-      </body>
+      </div>
     </div>
   );
 }
