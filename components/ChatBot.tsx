@@ -1,6 +1,6 @@
 import { PostTextCommand } from "@aws-sdk/client-lex-runtime-service";
 import ReactDOM from "react-dom";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { pallete } from "../styles";
 import { LexClientProvider, useLexClient } from "../contexts/LexClientContext";
@@ -43,7 +43,6 @@ const ChatWindow = styled.div<{ isOpen: boolean }>`
   height: 600px;
   background-color: ${pallete.chatbot.background};
   border-radius: 20px 20px 0 20px;
-  padding: 15px;
   box-shadow: ${({ isOpen }) =>
     isOpen ? "0px 2px 4px 3px rgb(100, 100, 100, 25%)" : "none"};
 
@@ -65,7 +64,7 @@ const ChatHistory = styled.div`
   width: 100%;
   flex-flow: column nowrap;
   overflow-y: scroll;
-  margin: 10px 0;
+  margin: 10px 0 0 0;
   padding-right: 10px;
   scroll-behavior: smooth;
 
@@ -83,10 +82,44 @@ const ChatHistory = styled.div`
   }
 `;
 
+const ChatFormHeader = styled.div`
+  background-color: ${pallete.purple};
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+
+  & > span {
+    color: ${pallete.white};
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
+  }
+`;
+
+const ResetChatButton = styled.div`
+  color: ${pallete.white};
+  font-weight: 600;
+  border: 2px solid ${pallete.white};
+  padding: 4px 16px;
+  border-radius: 30px;
+  opacity: 0.6;
+  transition: 0.15s opacity linear;
+
+  &:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
+`;
+
 const ChatForm = styled.form`
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+
+  & > * {
+    padding: 15px;
+  }
 `;
 
 const ChatControls = styled.div`
@@ -231,7 +264,7 @@ export const ChatBot = () => {
   const [input, setInput] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [thinking, setThinking] = useState(false);
-  const [userId] = useState(getUnixTime(new Date()));
+  const [userId, setUserId] = useState(getUnixTime(new Date()));
   const chatLogRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -256,7 +289,6 @@ export const ChatBot = () => {
     if (!containerRef.current || !isOpen) return;
 
     const handleClick = (e: MouseEvent) => {
-      console.log(e.target, e.currentTarget);
       for (let elem of e.composedPath()) {
         if (elem === containerRef.current) return;
       }
@@ -275,6 +307,12 @@ export const ChatBot = () => {
       e.preventDefault();
       sendMessage(e);
     }
+  };
+
+  const handleResetButtonClick = () => {
+    setUserId(getUnixTime(new Date()));
+    setChatHistory([]);
+    setInput("");
   };
 
   const sendMessage = async (e: React.FormEvent) => {
@@ -303,7 +341,7 @@ export const ChatBot = () => {
           sender: "bot",
         },
       ]);
-      console.log("Success. Response is: ", data.message);
+      //console.log("Success. Response is: ", data.message);
     } catch (err) {
       setChatHistory((prev) => [
         ...prev,
@@ -329,6 +367,12 @@ export const ChatBot = () => {
       <LexClientProvider>
         <ChatWindow isOpen={isOpen} ref={containerRef}>
           <ChatForm onSubmit={sendMessage}>
+            <ChatFormHeader>
+              <span>Scribe Chat Bot</span>
+              <ResetChatButton onClick={handleResetButtonClick}>
+                Reset
+              </ResetChatButton>
+            </ChatFormHeader>
             <ChatHistory ref={chatLogRef}>
               {chatHistory.map((message, index) => (
                 <ChatMessage key={`message-${index}`} {...message} />
