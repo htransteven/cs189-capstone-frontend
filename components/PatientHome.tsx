@@ -1,6 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
-import { ChatBot } from '.';
+import React from "react";
+import Link from "next/link";
+import { ChatBot } from ".";
 
 export const PatientHome = () => {
   return (
@@ -15,9 +15,7 @@ export const PatientHome = () => {
             >
               <header className="font-bold bg-purple-800 h-16 justify-center">
                 <div className="flex justify-center pt-1">
-                  <h2 className="font-bold text-white">
-                    Appointment #102391923
-                  </h2>
+                  <h2 className="font-bold text-white">Appointment #3333333</h2>
                 </div>
                 <div className="flex justify-center pt-1">
                   <h2 className="font-bold text-white">
