@@ -292,7 +292,8 @@ export const ChatMessage: React.FC<ChatEntry> = ({
         <PayloadLineItemHeader>Please select an option</PayloadLineItemHeader>
       )}
       {!lineItemSelected &&
-        lineItems?.map((li, index) => (
+        lineItems?.length > 0 &&
+        lineItems.map((li, index) => (
           <PayloadLineItem
             key={`${index}-${li}`}
             onClick={() => li.onClick(li)}
