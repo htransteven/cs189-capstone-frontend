@@ -1,4 +1,7 @@
-import { PostTextCommand } from "@aws-sdk/client-lex-runtime-service";
+import {
+  PostTextCommand,
+  DeleteSessionCommand,
+} from "@aws-sdk/client-lex-runtime-service";
 import ReactDOM from "react-dom";
 import React, { useState, useRef, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
@@ -357,7 +360,19 @@ export const ChatBot = () => {
     }
   };
 
-  const handleResetButtonClick = () => {
+  const handleResetButtonClick = async () => {
+    try {
+      const res: any = await lexClient.send(
+        new DeleteSessionCommand({
+          botAlias: process.env.NEXT_PUBLIC_BOT_ALIAS,
+          botName: process.env.NEXT_PUBLIC_BOT_NAME,
+          userId: `${userId}`,
+        })
+      );
+    } catch (err) {
+      console.log("Failed to delete session", err);
+      return;
+    }
     setUserId(getUnixTime(new Date()));
     setChatHistory([]);
     setInput("");
