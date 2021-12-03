@@ -8,9 +8,8 @@ export default function handler(req, res) {
     res.status(200).json({
       the_table_name : table_name,
       body: body,
-      theapptid: body.appointment_id
-     });
-    } else {
+    });
+  } else {
     res.status(400).send({ message: 'Only POST requests allowed' })
     return
   }
