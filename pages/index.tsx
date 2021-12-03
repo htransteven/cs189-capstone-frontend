@@ -33,7 +33,7 @@ export default function Home() {
     <div className="min-h-full">
       <header className="px-5 border-b">
         <div className="grid grid-cols-6 gap-4 py-4">
-          <h1 className="font-mono text-3xl font-bold text-gray-900">SRIBE</h1>
+          <h1 className="font-mono text-3xl font-bold text-gray-900">SCRIBE</h1>
         </div>
       </header>
       <header className="px-5 border-b">
