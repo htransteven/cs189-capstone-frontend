@@ -52,10 +52,17 @@ const ChatWindow = styled.div<{ isOpen: boolean }>`
   transition: 0.25s all ease-out;
 `;
 
+export interface LineItem {
+  value: string;
+  onClick?: (item: LineItem) => void;
+}
+
 export interface ChatEntry {
   message: string;
   timestamp: number;
   sender: "user" | "bot";
+  lineItems?: LineItem[];
+  lineItemSelected?: boolean;
 }
 
 const ChatHistory = styled.div`
@@ -240,10 +247,38 @@ const ThinkingAnimation = () => {
   );
 };
 
+const PayloadLineItemHeader = styled.span`
+  font-size: 0.9rem;
+  color: ${pallete.textSecondary};
+  margin: 5px 0;
+`;
+
+const PayloadLineItem = styled.div`
+  margin: 0;
+  font-family: inherit;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  background-color: ${pallete.chatbot.backgroundSecondary};
+  color: ${pallete.chatbot.primaryText};
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  align-self: flex-start;
+  max-width: 80%;
+  transition: 0.1s all linear;
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0px 0px 5px 2px rgba(44, 20, 20, 0.25);
+  }
+`;
+
 export const ChatMessage: React.FC<ChatEntry> = ({
   message,
   timestamp,
   sender,
+  lineItems,
+  lineItemSelected,
 }) => {
   return (
     <MessageWrapper>
@@ -253,6 +288,18 @@ export const ChatMessage: React.FC<ChatEntry> = ({
         </MessageTimestamp>
       </MessageMeta>
       <MessagePayload fromUser={sender === "user"}>{message}</MessagePayload>
+      {!lineItemSelected && lineItems?.length > 0 && (
+        <PayloadLineItemHeader>Please select an option</PayloadLineItemHeader>
+      )}
+      {!lineItemSelected &&
+        lineItems?.map((li, index) => (
+          <PayloadLineItem
+            key={`${index}-${li}`}
+            onClick={() => li.onClick(li)}
+          >
+            {li.value}
+          </PayloadLineItem>
+        ))}
     </MessageWrapper>
   );
 };
@@ -273,7 +320,7 @@ export const ChatBot = () => {
 
     setChatHistory([
       {
-        message: `Hello and welcome to Scribe! Your chat session ID is #${userId}. How may I help you?`,
+        message: `Hello and welcome to Scribe!\nYour chat session ID is #${userId}.\nHow may I help you?`,
         sender: "bot",
         timestamp: Date.now(),
       },
@@ -305,7 +352,7 @@ export const ChatBot = () => {
   const handleTextAreaKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      sendMessage(e);
+      sendMessage();
     }
   };
 
@@ -315,13 +362,12 @@ export const ChatBot = () => {
     setInput("");
   };
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.length === 0) return;
+  const sendMessage = async (message = input) => {
+    if (message.length === 0) return;
 
     setChatHistory((prev) => [
       ...prev,
-      { message: input, timestamp: Date.now(), sender: "user" },
+      { message, timestamp: Date.now(), sender: "user" },
     ]);
     setInput("");
     const lexParams = {
@@ -333,14 +379,29 @@ export const ChatBot = () => {
     setThinking(true);
     try {
       const data: any = await lexClient.send(new PostTextCommand(lexParams));
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          message: data.message || "Undefined response",
-          timestamp: Date.now(),
-          sender: "bot",
-        },
-      ]);
+      const [mainMessage, lineItems] = data.message.split("\noptions\n");
+      setChatHistory((prev) => {
+        const messageIndex = prev.length;
+        return [
+          ...prev,
+          {
+            message: mainMessage,
+            timestamp: Date.now(),
+            sender: "bot",
+            lineItems: lineItems?.split("\n").map((li: string) => ({
+              value: li,
+              onClick: () => {
+                setChatHistory((prev) => {
+                  const copy = [...prev];
+                  copy[messageIndex].lineItemSelected = true;
+                  return copy;
+                });
+                sendMessage(li.charAt(0));
+              },
+            })),
+          },
+        ];
+      });
       //console.log("Success. Response is: ", data.message);
     } catch (err) {
       setChatHistory((prev) => [
@@ -366,7 +427,12 @@ export const ChatBot = () => {
     <Wrapper>
       <LexClientProvider>
         <ChatWindow isOpen={isOpen} ref={containerRef}>
-          <ChatForm onSubmit={sendMessage}>
+          <ChatForm
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage();
+            }}
+          >
             <ChatFormHeader>
               <span>Scribe Chat Bot</span>
               <ResetChatButton onClick={handleResetButtonClick}>
