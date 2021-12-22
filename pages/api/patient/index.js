@@ -7,7 +7,7 @@ export default function handler(req, res) {
     putDatabaseInfo(table_name, body);
     res.status(200).json(body);
   } else {
-    res.status(400).send({ message: 'Only POST requests allowed' })
+    res.status(400).send({ message: `${req.method} is not a valid request` })
     return
   }
 }
