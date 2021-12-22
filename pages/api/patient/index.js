@@ -1,7 +1,7 @@
 const putDatabaseInfo = require("../service/database")
 
 export default function handler(req, res) {
-  if (req.method === 'POST') {
+  if (req.method === 'POST' || req.method === 'PUT') {
     const table_name = "patient"
     const body = JSON.parse(req.body)
     putDatabaseInfo(table_name, body);
