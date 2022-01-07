@@ -1,5 +1,6 @@
-import Link from "next/link";
-import React from "react";
+import Link from 'next/link';
+import React from 'react';
+import Tag from '../Tag';
 
 export const ProviderHome = () => {
   return (
@@ -58,15 +59,16 @@ export const ProviderHome = () => {
                 <p className="text-purple-700 text-bold mt-3">Tags</p>
                 <div className="flex">
                   <div className="flex flex-wrap mt-1">
-                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      Back Pain
-                    </span>
-                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      Covid-19
-                    </span>
-                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      Something Medical
-                    </span>
+                    <Tag
+                      text="Back Pain test"
+                      background="bg-gray-200"
+                      textColor="text-gray-700"
+                    />
+                    <Tag
+                      text="Covid-19"
+                      background="bg-indigo-300"
+                      textColor="text-gray-700"
+                    />
                   </div>
                 </div>
               </div>
