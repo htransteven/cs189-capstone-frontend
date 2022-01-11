@@ -3,8 +3,8 @@ const configureDatabase = require('../service/configure_database');
 var ddb = configureDatabase();
 
 export default function handler(req, res) {
+  const table_name = "appointments"
   if (req.method === 'POST' || req.method === 'PUT') {
-    const table_name = "appointment"
     const body = JSON.parse(req.body)
     putDatabaseInfo(table_name, body);
     res.status(200).json(body);
@@ -13,11 +13,11 @@ export default function handler(req, res) {
     if (query.patient_id) {
       const pat_id = query.patient_id
       var params={
-        TableName: 'appointment',
+        TableName: table_name,
         IndexName: 'patient_id-index',
         KeyConditionExpression: 'patient_id = :patient_id',
         ExpressionAttributeValues: {
-          ':patient_id': {'N': pat_id}
+          ':patient_id': {'S': pat_id}
         }
       }
 

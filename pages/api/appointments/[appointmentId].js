@@ -3,13 +3,14 @@ var ddb = configureDatabase();
 
 export default function handler(req, res) {
   const { appointmentId } = req.query
+  const table_name = "appointments"
   if (req.method === 'GET') {
     var params = {
       KeyConditionExpression: 'appointment_id = :appointment_id',
       ExpressionAttributeValues: {
         ':appointment_id': {'N': appointmentId}
       },
-      TableName: 'appointment'
+      TableName: table_name
     };
   
     ddb.query(params, function(err, data) {
@@ -26,7 +27,7 @@ export default function handler(req, res) {
       ExpressionAttributeValues: {
         ':appointment_id': {'N': appointmentId}
       },
-      TableName: 'appointment'
+      TableName: table_name
     };
   
     ddb.query(params, function(err, data) {
@@ -35,10 +36,10 @@ export default function handler(req, res) {
       } else if (data.Items[0]) {
         console.log("Success", JSON.stringify(data.Items));
         var params_del = {
-          TableName: 'appointment',
+          TableName: table_name,
           Key: {
             'appointment_id': {'N': appointmentId},
-            'patient_id' : {'N': data.Items[0].patient_id.N}
+            'patient_id' : {'S': data.Items[0].patient_id.S}
           }
         };
       
@@ -47,7 +48,7 @@ export default function handler(req, res) {
           console.log("Error", err);
         } else {
           res.status(200).json(data);
-          console.log("Success: deleted item from table(general_consult)", JSON.stringify(data));
+          console.log("Success: deleted item from table(general_consults)", JSON.stringify(data));
         }
         });
       } else {

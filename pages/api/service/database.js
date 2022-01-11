@@ -2,13 +2,13 @@ const configureDatabase = require('./configure_database');
 var ddb = configureDatabase();
 
 module.exports = (table_name, params) => {
-  if (!params.appointment_id && (table_name == "appointment" || table_name == "general_consult")) {
+  if (!params.appointment_id && (table_name == "appointments" || table_name == "general_consults")) {
     console.log("Error: missing required appointment_id key");
   } else if (!params.patient_id) {
     console.log("Error: missing required patient_id key");
   }
 
-  if (table_name === "patient") {
+  if (table_name === "patients") {
     if (!params.first_name) {
       params['first_name'] = "";
     }
@@ -28,7 +28,7 @@ module.exports = (table_name, params) => {
       params['birthday'] = "";
     }
   }
-  if (table_name === "appointment") {
+  if (table_name === "appointments") {
     if (!params.appointment_type) {
       params['appointment_type'] = "";
     }
@@ -39,7 +39,7 @@ module.exports = (table_name, params) => {
       params['appointment_time'] = "";
     }
   }
-  if (table_name === "general_consult") {
+  if (table_name === "general_consults") {
     if (!params.doctor_diagnosis) {
       params['doctor_diagnosis'] = "";
     }
@@ -54,7 +54,7 @@ module.exports = (table_name, params) => {
   var table_info_patient = {
     TableName: table_name,
     Item: {
-      'patient_id': {N: params.patient_id},
+      'patient_id': {S: params.patient_id},
       'first_name': {S: params.first_name},
       'last_name': {S: params.last_name},
       'sex': {S: params.sex},
@@ -67,7 +67,7 @@ module.exports = (table_name, params) => {
     TableName: table_name,
     Item: {
       'appointment_id': {N: params.appointment_id},
-      'patient_id': {N: params.patient_id},
+      'patient_id': {S: params.patient_id},
       'appointment_type': {S: params.appointment_type},
       'doctor': {S: params.doctor},
       'appointment_time': {S: params.appointment_time},
@@ -77,7 +77,7 @@ module.exports = (table_name, params) => {
     TableName: table_name,
     Item: {
       'appointment_id': {N: params.appointment_id},
-      'patient_id': {N: params.patient_id},
+      'patient_id': {S: params.patient_id},
       'doctor_diagnosis': {S: params.doctor_diagnosis},
       'symptoms': {S: params.symptoms},
       'initial_diagnosis': {S: params.initial_diagnosis},
@@ -85,7 +85,7 @@ module.exports = (table_name, params) => {
   }
 
   switch (table_name) {
-    case 'patient':
+    case 'patients':
       ddb.putItem(table_info_patient, function(err, data) {
         if (err) {
           console.log("Error", err);
@@ -94,7 +94,7 @@ module.exports = (table_name, params) => {
         }
       });
       break;
-    case 'appointment':
+    case 'appointments':
       ddb.putItem(table_info_appointment, function(err, data) {
         if (err) {
           console.log("Error", err);
@@ -103,7 +103,7 @@ module.exports = (table_name, params) => {
         }
       });
       break;
-    case 'general_consult':
+    case 'general_consults':
       ddb.putItem(table_info_general_consult, function(err, data) {
         if (err) {
           console.log("Error", err);
