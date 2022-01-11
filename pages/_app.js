@@ -1,14 +1,14 @@
-import 'tailwindcss/tailwind.css';
-import { UserProvider } from '@auth0/nextjs-auth0';
-import { AppWrapper } from '../contexts/AppContext';
+import "tailwindcss/tailwind.css";
+import { UserProvider as AuthProvider } from "@auth0/nextjs-auth0";
+import { UserProvider } from "../contexts/UserContext";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <AppWrapper>
+    <AuthProvider>
       <UserProvider>
         <Component {...pageProps} />
       </UserProvider>
-    </AppWrapper>
+    </AuthProvider>
   );
 }
 
