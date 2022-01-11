@@ -1,11 +1,24 @@
-import { ChatBot } from "../../components";
+import { PatientHome, ProviderHome } from "../../components";
+import Navbar from "../../components/Navbar";
+import { useRole } from "../../contexts/UserContext";
 
-const Index = () => {
+const DashboardPage = () => {
+  const role = useRole();
+
+  let pageToRender = null;
+  switch (role) {
+    case "patient":
+      pageToRender = <PatientHome />;
+    case "provider":
+      pageToRender = <ProviderHome />;
+  }
+
   return (
-    <div>
-      <ChatBot />
-    </div>
+    <>
+      <Navbar />
+      <div className="antialiased bg-gray-200 p-6 h-screen">{pageToRender}</div>
+    </>
   );
 };
 
-export default Index;
+export default DashboardPage;
