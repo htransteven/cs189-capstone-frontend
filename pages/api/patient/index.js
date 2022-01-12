@@ -1,4 +1,4 @@
-const putDatabaseInfo = require("../service/database")
+const putDatabaseInfo = require("../../../service/database")
 
 export default function handler(req, res) {
   if (req.method === 'POST' || req.method === 'PUT') {

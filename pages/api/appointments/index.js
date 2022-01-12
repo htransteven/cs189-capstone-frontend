@@ -1,5 +1,5 @@
-const putDatabaseInfo = require("../service/database")
-const configureDatabase = require('../service/configure_database');
+const putDatabaseInfo = require("../../../service/database")
+const configureDatabase = require('../../../service/configure_database');
 var ddb = configureDatabase();
 
 export default function handler(req, res) {
