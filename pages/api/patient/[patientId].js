@@ -1,5 +1,6 @@
 const configureDatabase = require('../../../service/configure_database');
 var ddb = configureDatabase();
+var AWS = require('aws-sdk');
 
 export default function handler(req, res) {
   const { patientId } = req.query
@@ -17,8 +18,8 @@ export default function handler(req, res) {
       if (err) {
         console.log("Error", err);
       } else {
-        res.status(200).json(data.Items);
-        console.log("Success", JSON.stringify(data.Items));
+        res.status(200).json(AWS.DynamoDB.Converter.unmarshall(data.Items[0]));
+        console.log("Success", JSON.stringify(AWS.DynamoDB.Converter.unmarshall(data.Items[0])));
       }
     });
   } else if (req.method === 'DELETE') {
