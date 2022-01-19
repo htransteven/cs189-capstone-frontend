@@ -1,4 +1,4 @@
-import { PatientHome, ProviderHome } from "../../components";
+import { PatientHome, DoctorHome } from "../../components";
 import Navbar from "../../components/Navbar";
 import { useRole } from "../../contexts/UserContext";
 
@@ -9,8 +9,8 @@ const DashboardPage = () => {
   switch (role) {
     case "patient":
       pageToRender = <PatientHome />;
-    case "provider":
-      pageToRender = <ProviderHome />;
+    case "doctor":
+      pageToRender = <DoctorHome />;
   }
 
   return (

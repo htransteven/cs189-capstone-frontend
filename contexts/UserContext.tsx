@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import { useUser as useAuthUser } from "@auth0/nextjs-auth0";
 import { Login } from "../components/Login";
+import { Role } from "../api/models";
 
 const UserContext = createContext(null);
 
@@ -9,9 +10,7 @@ export const useUser = () => {
   return user;
 };
 
-export type UserRole = "patient" | "provider";
-
-export const useRole = (): UserRole | null => {
+export const useRole = (): Role => {
   const user = useContext(UserContext);
   const role = user["https://myapp/role"][0];
 
@@ -19,7 +18,7 @@ export const useRole = (): UserRole | null => {
     case "Patient":
       return "patient";
     case "Provider":
-      return "provider";
+      return "doctor";
     default:
       return null;
   }

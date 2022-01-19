@@ -18,11 +18,17 @@ export default function handler(req, res) {
       if (err) {
         console.log("Error", err);
       } else {
-        res.status(200).json(AWS.DynamoDB.Converter.unmarshall(data.Items[0]));
-        console.log(
-          "Success",
-          JSON.stringify(AWS.DynamoDB.Converter.unmarshall(data.Items[0]))
-        );
+        if (data.Count === 0) {
+          res.status(404).send();
+        } else {
+          res
+            .status(200)
+            .json(AWS.DynamoDB.Converter.unmarshall(data.Items[0]));
+          console.log(
+            "Success",
+            JSON.stringify(AWS.DynamoDB.Converter.unmarshall(data.Items[0]))
+          );
+        }
       }
     });
   } else if (req.method === "DELETE") {
@@ -60,11 +66,9 @@ export default function handler(req, res) {
         });
       } else {
         console.log("Error in retrieving patient id from appointment id", err);
-        res
-          .status(400)
-          .send({
-            message: "Error in retreiving patient id from appointment id",
-          });
+        res.status(400).send({
+          message: "Error in retreiving patient id from appointment id",
+        });
       }
     });
   } else {

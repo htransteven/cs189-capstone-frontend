@@ -3,7 +3,8 @@ export const pallete = {
   purple: "#351F65",
   white: "#FFFFFF",
   offwhite: "#F4F4F4",
-  textSecondary: "#a2a2a2",
+  textPrimary: "#000000",
+  textSecondary: "#5f5f5f",
   chatbot: {
     background: "#FFFFFF",
     backgroundSecondary: "#F4F4F4",

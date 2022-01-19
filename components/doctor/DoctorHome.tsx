@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import React from 'react';
-import Tag from '../Tag';
+import Link from "next/link";
+import React from "react";
+import Tag from "../Tag";
 
-export const ProviderHome = () => {
+export const DoctorHome = () => {
   return (
     <div className="container mx-auto">
       <div className="flex flex-wrap -mx-4">

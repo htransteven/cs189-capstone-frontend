@@ -4,6 +4,7 @@ import { UserProvider } from "../contexts/UserContext";
 import { ApiProvider } from "../contexts/APIClientContext";
 import AuthWrapper from "../components/AuthWrapper";
 import { createGlobalStyle } from "styled-components";
+import { pallete } from "../styles";
 
 const GlobalStyle = createGlobalStyle`
 html{
@@ -15,7 +16,9 @@ html{
 body{
   margin:0;
   padding: 0;
-  font-size: 14px;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  background-color: ${pallete.offwhite};
 }
 `;
 

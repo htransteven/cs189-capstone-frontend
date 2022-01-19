@@ -10,7 +10,7 @@ export interface Medication {
 }
 
 export interface Patient {
-  id: string;
+  patient_id: string;
   first_name: string;
   last_name: string;
   birthday: number; // unix timestamp

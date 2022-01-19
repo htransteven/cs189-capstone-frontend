@@ -5,7 +5,7 @@ const AuthWrapper = ({ children }) => {
   const role = useRole();
   const router = useRouter();
 
-  if (router.asPath.includes("/provider") && role !== "provider") {
+  if (router.asPath.includes("/doctor") && role !== "doctor") {
     router.replace("/dashboard");
     return <></>;
   }
