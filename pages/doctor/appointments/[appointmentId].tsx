@@ -6,7 +6,7 @@ import { useApi } from "../../../contexts/APIClientContext";
 import { Appointment, Doctor, Patient } from "../../../api/models";
 import Navbar from "../../../components/Navbar";
 import { pallete } from "../../../styles";
-import { format, fromUnixTime } from "date-fns";
+import { format, fromUnixTime, getUnixTime } from "date-fns";
 
 const Banner = styled.div`
   background-color: ${pallete.purple};
@@ -212,6 +212,7 @@ const DiagnosisInfo: React.FC<Appointment> = ({
   doctor_diagnosis,
   initial_diagnosis,
   symptoms,
+  comments,
 }) => {
   return (
     <Card>
@@ -235,6 +236,17 @@ const DiagnosisInfo: React.FC<Appointment> = ({
       <RowLayout>
         <Label>Doctor's Diagnosis</Label>
         <Value>{doctor_diagnosis}</Value>
+      </RowLayout>
+      <RowLayout>
+        <Label>Comments</Label>
+        <ColumnLayout gap={10}>
+          {comments.map((comment, index) => (
+            <Value key={`id-${index}`}>
+              {format(fromUnixTime(comment.time), "MM/dd/yyyy hh:mm:ss a")}
+              {comment.message}
+            </Value>
+          ))}
+        </ColumnLayout>
       </RowLayout>
     </Card>
   );
@@ -283,6 +295,21 @@ const AppointmentPage = () => {
     getAppointment();
   }, [apiClient, appointmentId]);
 
+  const handleClick = () => {
+    apiClient.appointments.put(appointment.appointment_id, {
+      ...appointment,
+      comments: [
+        ...appointment.comments,
+        {
+          author_id: appointment.doctor_id,
+          role: "doctor",
+          time: getUnixTime(new Date()),
+          message: "hello world",
+        },
+      ],
+    });
+  };
+
   return (
     <>
       <Navbar />
@@ -295,6 +322,7 @@ const AppointmentPage = () => {
             <PatientInfo {...patient} />
             <AppointmentInfo {...appointment} doctor={doctor} />
             <DiagnosisInfo {...appointment} />
+            <button onClick={handleClick}>Test</button>
           </RowLayout>
         )}
       </Wrapper>

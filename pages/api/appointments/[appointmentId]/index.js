@@ -1,4 +1,6 @@
-const configureDatabase = require("../../../api/configure_database");
+import { DynamoDB } from "aws-sdk";
+
+const configureDatabase = require("../../../../api/configure_database");
 var ddb = configureDatabase();
 var AWS = require("aws-sdk");
 
@@ -29,6 +31,39 @@ export default function handler(req, res) {
             JSON.stringify(AWS.DynamoDB.Converter.unmarshall(data.Items[0]))
           );
         }
+      }
+    });
+  } else if (req.method === "PUT") {
+    const body = JSON.parse(req.body);
+    const keys = Object.keys(body).filter(
+      (key) => key != "appointment_id" && key != "patient_id"
+    );
+    const params = {
+      TableName: table_name,
+      Key: {
+        appointment_id: { N: appointmentId },
+        patient_id: { S: body.patient_id },
+      },
+      UpdateExpression: `set ${keys
+        .map((key) => `${key} = :${key}`)
+        .join(", ")}`,
+      ExpressionAttributeValues: AWS.DynamoDB.Converter.marshall(
+        keys.reduce((prev, curr) => {
+          return curr === "appointment_id"
+            ? { ...prev }
+            : { ...prev, [`:${curr}`]: body[curr] };
+        }, {})
+      ),
+      ReturnValues: "UPDATED_NEW",
+    };
+
+    console.log(params);
+
+    ddb.updateItem(params, (err, data) => {
+      if (err) {
+        console.log("Error", err);
+      } else {
+        console.log("Success", data);
       }
     });
   } else if (req.method === "DELETE") {
