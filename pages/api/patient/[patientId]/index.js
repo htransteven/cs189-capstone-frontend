@@ -2,50 +2,78 @@ const configureDatabase = require("../../../../api/configure_database");
 var ddb = configureDatabase();
 var AWS = require("aws-sdk");
 
-export default function handler(req, res) {
+const table_name = "patients";
+
+const handleGet = async (patientId) => {
+  var params = {
+    KeyConditionExpression: "patient_id = :patient_id",
+    ExpressionAttributeValues: {
+      ":patient_id": { S: patientId },
+    },
+    TableName: table_name,
+  };
+
+  try {
+    const data = await ddb.query(params).promise();
+    const patient = AWS.DynamoDB.Converter.unmarshall(data.Items[0]);
+    console.log("GET Patient", patient);
+    return {
+      code: 200,
+      data: patient,
+    };
+  } catch (err) {
+    console.log("Error", err);
+    return {
+      code: 400,
+      data: err,
+    };
+  }
+};
+
+const handleDelete = async (req, res) => {
   const { patientId } = req.query;
-  const table_name = "patients";
+  var params = {
+    TableName: table_name,
+    Key: {
+      patient_id: { S: patientId },
+    },
+  };
+
+  try {
+    const data = await ddb.query(params).promise();
+    const patient = AWS.DynamoDB.Converter.unmarshall(data.Items[0]);
+    res.status(200).json(patient).send();
+    console.log(
+      "Success: deleted item from table(patients)",
+      JSON.stringify(data)
+    );
+    console.log("DELETE Patient", patient);
+
+    return {
+      code: 200,
+      data: patient,
+    };
+  } catch (err) {
+    console.log("Error", err);
+
+    return {
+      code: 400,
+      data: err,
+    };
+  }
+};
+
+const handler = async (req, res) => {
+  const { patientId } = req.query;
   if (req.method === "GET") {
-    var params = {
-      KeyConditionExpression: "patient_id = :patient_id",
-      ExpressionAttributeValues: {
-        ":patient_id": { S: patientId },
-      },
-      TableName: table_name,
-    };
-
-    ddb.query(params, function (err, data) {
-      if (err) {
-        console.log("Error", err);
-      } else {
-        res.status(200).json(AWS.DynamoDB.Converter.unmarshall(data.Items[0]));
-        console.log(
-          "Success",
-          JSON.stringify(AWS.DynamoDB.Converter.unmarshall(data.Items[0]))
-        );
-      }
-    });
+    const { code, data } = await handleGet(patientId);
+    res.status(code).json(data);
   } else if (req.method === "DELETE") {
-    var params = {
-      TableName: table_name,
-      Key: {
-        patient_id: { S: patientId },
-      },
-    };
-
-    ddb.deleteItem(params, function (err, data) {
-      if (err) {
-        console.log("Error", err);
-      } else {
-        res.status(200).json(data);
-        console.log(
-          "Success: deleted item from table(patients)",
-          JSON.stringify(data)
-        );
-      }
-    });
+    const { code, data } = await handleDelete(patientId);
+    res.status(code).json(data);
   } else {
     res.status(400).send({ message: `${req.method} is not a valid request` });
-    return;
   }
-}
+};
+
+export default handler;
