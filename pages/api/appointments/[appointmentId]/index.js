@@ -62,8 +62,12 @@ export default function handler(req, res) {
     ddb.updateItem(params, (err, data) => {
       if (err) {
         console.log("Error", err);
+        res.status(400).send(err);
       } else {
         console.log("Success", data);
+        res
+          .status(200)
+          .send(AWS.DynamoDB.Converter.unmarshall(data.Attributes));
       }
     });
   } else if (req.method === "DELETE") {

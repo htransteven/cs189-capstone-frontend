@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect, FunctionComponent } from "react";
 import { useApi } from "../../../contexts/APIClientContext";
-import { Appointment, Doctor, Patient } from "../../../api/models";
+import { Appointment, Doctor, Patient, Comment } from "../../../api/models";
 import Navbar from "../../../components/Navbar";
 import { pallete } from "../../../styles";
 import { format, fromUnixTime, getUnixTime } from "date-fns";
@@ -26,10 +26,10 @@ const RowLayout = styled.div<{ gap?: number }>`
   & > * {
     margin: 0 ${({ gap }) => gap / 2}px;
 
-    &:first-of-type {
+    &:first-child {
       margin-left: 0;
     }
-    &:last-of-type {
+    &:last-child {
       margin-right: 0;
     }
   }
@@ -42,10 +42,10 @@ const ColumnLayout = styled.div<{ gap?: number }>`
   & > * {
     margin: ${({ gap }) => gap / 2}px 0;
 
-    &:first-of-type {
+    &:first-child {
       margin-top: 0;
     }
-    &:last-of-type {
+    &:last-child {
       margin-bottom: 0;
     }
   }
@@ -55,7 +55,7 @@ const Card = styled.div`
   padding: 35px;
   background-color: ${pallete.white};
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
+  border-radius: 5px;
 
   & > ${RowLayout} {
     margin: 15px 0;
@@ -71,7 +71,7 @@ const Card = styled.div`
 
 const CardTitle = styled.span`
   display: flex;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   margin-bottom: 15px;
   font-weight: 700;
   letter-spacing: 0.05rem;
@@ -90,7 +90,7 @@ const Label = styled.div`
 
 const Value = styled.div`
   color: ${pallete.textPrimary};
-  font-size: 1.2rem;
+  font-size: 1rem;
   line-height: 1rem;
   font-weight: 400;
   letter-spacing: 0.05rem;
@@ -237,17 +237,87 @@ const DiagnosisInfo: React.FC<Appointment> = ({
         <Label>Doctor's Diagnosis</Label>
         <Value>{doctor_diagnosis}</Value>
       </RowLayout>
-      <RowLayout>
-        <Label>Comments</Label>
-        <ColumnLayout gap={10}>
+    </Card>
+  );
+};
+
+const CommentInput = styled.input`
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border: 2px solid ${pallete.purple};
+  padding: 6px 10px;
+  border-radius: 5px;
+`;
+
+const CommentButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 6px 20px;
+  border-radius: 3px;
+  color: ${pallete.white};
+  background-color: ${pallete.purple};
+  font-size: 0.8rem;
+`;
+
+const DeleteCommentButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 3px;
+  color: ${pallete.white};
+  background-color: ${pallete.textSecondary};
+  font-size: 0.7rem;
+`;
+
+const CommentsSection: React.FC<{
+  comments: Comment[];
+  addComment: (value: string) => void;
+  deleteComment: (index: number) => void;
+}> = ({ comments, addComment, deleteComment }) => {
+  const [input, setInput] = useState("");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    addComment(input);
+    setInput("");
+  };
+
+  return (
+    <Card>
+      <form onSubmit={handleSubmit}>
+        <CardTitle>Comments</CardTitle>
+        <ColumnLayout gap={15}>
           {comments.map((comment, index) => (
-            <Value key={`id-${index}`}>
-              {format(fromUnixTime(comment.time), "MM/dd/yyyy hh:mm:ss a")}
-              {comment.message}
-            </Value>
+            <ColumnLayout key={`id-${index}`} gap={5}>
+              <RowLayout gap={5} style={{ alignItems: "center" }}>
+                <Label>
+                  {`${comment.role} - `}
+                  {format(fromUnixTime(comment.time), "MM/dd/yyyy hh:mm:ss a")}
+                </Label>
+                <DeleteCommentButton
+                  type={"button"}
+                  onClick={() => deleteComment(index)}
+                >
+                  Delete Comment
+                </DeleteCommentButton>
+              </RowLayout>
+              <Value>{comment.message}</Value>
+            </ColumnLayout>
           ))}
+          <RowLayout gap={10}>
+            <CommentInput
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <CommentButton type={"submit"}>Add Comment</CommentButton>
+          </RowLayout>
         </ColumnLayout>
-      </RowLayout>
+      </form>
     </Card>
   );
 };
@@ -295,8 +365,8 @@ const AppointmentPage = () => {
     getAppointment();
   }, [apiClient, appointmentId]);
 
-  const handleClick = () => {
-    apiClient.appointments.put(appointment.appointment_id, {
+  const addComment = async (value: string) => {
+    const res = await apiClient.appointments.put(appointment.appointment_id, {
       ...appointment,
       comments: [
         ...appointment.comments,
@@ -304,10 +374,28 @@ const AppointmentPage = () => {
           author_id: appointment.doctor_id,
           role: "doctor",
           time: getUnixTime(new Date()),
-          message: "hello world",
+          message: value,
         },
       ],
     });
+
+    if (!res) return;
+
+    setAppointment({ ...appointment, ...res });
+  };
+
+  const deleteComment = async (index: number) => {
+    const res = await apiClient.appointments.put(appointment.appointment_id, {
+      ...appointment,
+      comments: [
+        ...appointment.comments.slice(0, index),
+        ...appointment.comments.slice(index + 1),
+      ],
+    });
+
+    if (!res) return;
+
+    setAppointment({ ...appointment, ...res });
   };
 
   return (
@@ -318,12 +406,18 @@ const AppointmentPage = () => {
         {loading && <div>Searching for appointment #{appointmentId}</div>}
         {!loading && !appointment && <div>Appointment not found</div>}
         {appointment && patient && doctor && (
-          <RowLayout gap={15}>
-            <PatientInfo {...patient} />
-            <AppointmentInfo {...appointment} doctor={doctor} />
-            <DiagnosisInfo {...appointment} />
-            <button onClick={handleClick}>Test</button>
-          </RowLayout>
+          <ColumnLayout gap={15}>
+            <RowLayout gap={15}>
+              <PatientInfo {...patient} />
+              <AppointmentInfo {...appointment} doctor={doctor} />
+              <DiagnosisInfo {...appointment} />
+            </RowLayout>
+            <CommentsSection
+              comments={appointment.comments}
+              addComment={addComment}
+              deleteComment={deleteComment}
+            />
+          </ColumnLayout>
         )}
       </Wrapper>
     </>
