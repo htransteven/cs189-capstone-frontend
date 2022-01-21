@@ -276,8 +276,7 @@ const DeleteCommentButton = styled.button`
 const CommentsSection: React.FC<{
   comments: Comment[];
   addComment: (value: string) => void;
-  deleteComment: (index: number) => void;
-}> = ({ comments, addComment, deleteComment }) => {
+}> = ({ comments, addComment }) => {
   const [input, setInput] = useState("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -298,12 +297,6 @@ const CommentsSection: React.FC<{
                   {`${comment.role} - `}
                   {format(fromUnixTime(comment.time), "MM/dd/yyyy hh:mm:ss a")}
                 </Label>
-                <DeleteCommentButton
-                  type={"button"}
-                  onClick={() => deleteComment(index)}
-                >
-                  Delete Comment
-                </DeleteCommentButton>
               </RowLayout>
               <Value>{comment.message}</Value>
             </ColumnLayout>
@@ -383,20 +376,6 @@ const AppointmentPage = () => {
     setAppointment({ ...appointment, ...res });
   };
 
-  const deleteComment = async (index: number) => {
-    const res = await apiClient.appointments.put(appointment.appointment_id, {
-      ...appointment,
-      comments: [
-        ...appointment.comments.slice(0, index),
-        ...appointment.comments.slice(index + 1),
-      ],
-    });
-
-    if (!res) return;
-
-    setAppointment({ ...appointment, ...res });
-  };
-
   return (
     <>
       <Navbar />
@@ -414,7 +393,6 @@ const AppointmentPage = () => {
             <CommentsSection
               comments={appointment.comments}
               addComment={addComment}
-              deleteComment={deleteComment}
             />
           </ColumnLayout>
         )}
