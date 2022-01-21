@@ -1,7 +1,7 @@
 const configureCloudwatch = require("../../../../api/configure_cloudwatch");
 var cw = configureCloudwatch();
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const { appointmentId } = req.query;
   const table_name = "appointments";
   if (req.method === "GET") {
