@@ -1,4 +1,4 @@
-import { Appointment, Doctor, Patient } from "./models";
+import { Appointment, Doctor, Patient, Role } from "./models";
 
 export interface APIClient {
   appointments: {
@@ -7,6 +7,7 @@ export interface APIClient {
       appointmentId: number,
       changes: Partial<Appointment>
     ) => Promise<Appointment | null>;
+    getAll: (id: string, role: Role) => Promise<Appointment[] | null>;
   };
   patients: {
     get: (patientId: string) => Promise<Patient | null>;
@@ -28,6 +29,25 @@ export const createClient = (): APIClient => {
         const appointment = await res.json();
 
         return appointment as Appointment;
+      },
+      getAll: async (id: string, role: Role) => {
+        switch (role) {
+          case "doctor": {
+            const res = await fetch(`/api/doctor/${id}/appointments`);
+            if (!res.ok) {
+              return null;
+            }
+
+            const appointments = await res.json();
+
+            return appointments as Appointment[];
+          }
+          case "patient": {
+            break;
+          }
+          default:
+            return null;
+        }
       },
       put: async (appointmentId: number, changes: Partial<Appointment>) => {
         const res = await fetch(`/api/appointments/${appointmentId}`, {

@@ -8,32 +8,6 @@ export default function handler(req, res) {
     const body = JSON.parse(req.body);
     putDatabaseInfo(table_name, body);
     res.status(200).json(body);
-  } else if (req.method === "GET") {
-    const query = req.query;
-    if (query.patient_id) {
-      const pat_id = query.patient_id;
-      var params = {
-        TableName: table_name,
-        IndexName: "patient_id-index",
-        KeyConditionExpression: "patient_id = :patient_id",
-        ExpressionAttributeValues: {
-          ":patient_id": { S: pat_id },
-        },
-      };
-
-      ddb.query(params, function (err, data) {
-        if (err) {
-          console.log("Error", err);
-        } else {
-          res.status(200).json(data.Items);
-          console.log("Success", data.Items);
-        }
-      });
-    } else {
-      res
-        .status(400)
-        .send({ message: `Query params do not contain patient_id` });
-    }
   } else {
     res.status(400).send({ message: `${req.method} is not a valid request` });
     return;

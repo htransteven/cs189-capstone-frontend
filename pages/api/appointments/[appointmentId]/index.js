@@ -1,5 +1,3 @@
-import { DynamoDB } from "aws-sdk";
-
 const configureDatabase = require("../../../../api/configure_database");
 var ddb = configureDatabase();
 var AWS = require("aws-sdk");

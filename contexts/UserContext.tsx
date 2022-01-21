@@ -1,12 +1,13 @@
 import { createContext, useContext } from "react";
-import { useUser as useAuthUser } from "@auth0/nextjs-auth0";
+import { UserProfile, useUser as useAuthUser } from "@auth0/nextjs-auth0";
 import { Login } from "../components/Login";
 import { Role } from "../api/models";
 
 const UserContext = createContext(null);
 
-export const useUser = () => {
-  const user = useContext(UserContext);
+export const useUser = (): UserProfile => {
+  const user: UserProfile = useContext(UserContext);
+  user.sub = user.sub.substring(user.sub.indexOf("|") + 1);
   return user;
 };
 

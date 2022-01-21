@@ -1,15 +1,15 @@
-const configureDatabase = require("../../../api/configure_database");
+const configureDatabase = require("../../../../api/configure_database");
 var ddb = configureDatabase();
 var AWS = require("aws-sdk");
 
 export default function handler(req, res) {
-  const { doctorId } = req.query;
-  const table_name = "doctors";
+  const { patientId } = req.query;
+  const table_name = "patients";
   if (req.method === "GET") {
     var params = {
-      KeyConditionExpression: "doctor_id = :doctor_id",
+      KeyConditionExpression: "patient_id = :patient_id",
       ExpressionAttributeValues: {
-        ":doctor_id": { S: doctorId },
+        ":patient_id": { S: patientId },
       },
       TableName: table_name,
     };
@@ -29,7 +29,7 @@ export default function handler(req, res) {
     var params = {
       TableName: table_name,
       Key: {
-        doctor_id: { S: doctorId },
+        patient_id: { S: patientId },
       },
     };
 
@@ -39,7 +39,7 @@ export default function handler(req, res) {
       } else {
         res.status(200).json(data);
         console.log(
-          "Success: deleted item from table(doctors)",
+          "Success: deleted item from table(patients)",
           JSON.stringify(data)
         );
       }
