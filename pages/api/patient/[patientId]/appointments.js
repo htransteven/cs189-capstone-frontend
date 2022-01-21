@@ -5,9 +5,9 @@ var AWS = require("aws-sdk");
 export default function handler(req, res) {
   const table_name = "appointments";
   if (req.method === "GET") {
-    const query = req.query;
+    const { patientId } = req.query;
 
-    if (!query.patient_id) {
+    if (!patientId) {
       res
         .status(400)
         .send({ message: `Query params do not contain patient_id` });
@@ -18,7 +18,7 @@ export default function handler(req, res) {
       IndexName: "patient_id-index",
       KeyConditionExpression: "patient_id = :patient_id",
       ExpressionAttributeValues: {
-        ":patient_id": { S: query.doctor_id },
+        ":patient_id": { S: patientId },
       },
     };
 

@@ -31,23 +31,14 @@ export const createClient = (): APIClient => {
         return appointment as Appointment;
       },
       getAll: async (id: string, role: Role) => {
-        switch (role) {
-          case "doctor": {
-            const res = await fetch(`/api/doctor/${id}/appointments`);
-            if (!res.ok) {
-              return null;
-            }
-
-            const appointments = await res.json();
-
-            return appointments as Appointment[];
-          }
-          case "patient": {
-            break;
-          }
-          default:
-            return null;
+        const res = await fetch(`/api/${role}/${id}/appointments`);
+        if (!res.ok) {
+          return null;
         }
+
+        const appointments = await res.json();
+
+        return appointments as Appointment[];
       },
       put: async (appointmentId: number, changes: Partial<Appointment>) => {
         const res = await fetch(`/api/appointments/${appointmentId}`, {
