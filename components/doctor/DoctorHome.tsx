@@ -6,7 +6,7 @@ import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
 import Tag from "../Tag";
 
-const AppointmentCard: React.FC<Appointment> = ({
+export const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
   appointment_time,
   patient_id,
