@@ -1,4 +1,4 @@
-const configureDatabase = require("../../../../api/configure_database");
+const configureDatabase = require("../../../../api-utils/configure_database");
 var ddb = configureDatabase();
 var AWS = require("aws-sdk");
 

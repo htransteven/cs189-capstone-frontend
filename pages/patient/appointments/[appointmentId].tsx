@@ -3,10 +3,16 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useState, useEffect, FunctionComponent } from "react";
 import { useApi } from "../../../contexts/APIClientContext";
-import { Appointment, Doctor, Patient, Comment } from "../../../api/models";
+import {
+  Appointment,
+  Doctor,
+  Patient,
+  Comment,
+} from "../../../api-utils/models";
 import Navbar from "../../../components/Navbar";
 import { pallete } from "../../../styles";
 import { format, fromUnixTime, getUnixTime } from "date-fns";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 const Banner = styled.div`
   background-color: ${pallete.purple};
@@ -401,4 +407,4 @@ const AppointmentPage = () => {
   );
 };
 
-export default AppointmentPage;
+export default withPageAuthRequired(AppointmentPage);

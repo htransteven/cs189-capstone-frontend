@@ -1,4 +1,4 @@
-const putDatabaseInfo = require("../../../api/database");
+const putDatabaseInfo = require("../../../api-utils/database");
 
 export default function handler(req, res) {
   if (req.method === "POST" || req.method === "PUT") {

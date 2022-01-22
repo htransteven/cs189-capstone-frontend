@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { createClient } from "../api/client";
+import { createClient } from "../api-utils/client";
 
 const apiClient = createClient();
 const clientContext = createContext(apiClient);

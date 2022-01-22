@@ -1,10 +1,11 @@
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import React, { useEffect, useState } from "react";
-import { AppointmentCard } from "..";
-import { Appointment } from "../../api/models";
+import { AppointmentCard } from "../doctor/index";
+import { Appointment } from "../../api-utils/models";
 import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
 
-export const PatientHome = () => {
+const PatientHome = () => {
   const user = useUser();
   const role = useRole();
   const apiClient = useApi();
@@ -44,3 +45,5 @@ export const PatientHome = () => {
     </div>
   );
 };
+
+export default withPageAuthRequired(PatientHome);

@@ -1,10 +1,11 @@
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { format, fromUnixTime } from "date-fns";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Appointment, Doctor, Patient } from "../../api/models";
+import { Appointment, Doctor, Patient } from "../../api-utils/models";
 import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
-import Tag from "../Tag";
+import Tag from "../../components/Tag";
 
 export const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
@@ -129,7 +130,7 @@ export const AppointmentCard: React.FC<Appointment> = ({
   );
 };
 
-export const DoctorHome = () => {
+const DoctorHomePage = () => {
   const user = useUser();
   const role = useRole();
   const apiClient = useApi();
@@ -169,3 +170,5 @@ export const DoctorHome = () => {
     </div>
   );
 };
+
+export default withPageAuthRequired(DoctorHomePage);

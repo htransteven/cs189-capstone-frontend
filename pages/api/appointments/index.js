@@ -1,5 +1,5 @@
-const putDatabaseInfo = require("../../../api/database");
-const configureDatabase = require("../../../api/configure_database");
+const putDatabaseInfo = require("../../../api-utils/database");
+const configureDatabase = require("../../../api-utils/configure_database");
 var ddb = configureDatabase();
 
 export default function handler(req, res) {

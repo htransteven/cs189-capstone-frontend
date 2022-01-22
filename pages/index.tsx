@@ -1,24 +1,27 @@
-import { PatientHome, DoctorHome } from "../components";
-import Navbar from "../components/Navbar";
+/* eslint-disable react/no-unescaped-entities */
+import { useRouter } from "next/router";
+import { Login } from "../components";
 import { useRole } from "../contexts/UserContext";
 
 const DashboardPage = () => {
   const role = useRole();
+  const router = useRouter();
 
-  let pageToRender = null;
   switch (role) {
-    case "patient":
-      pageToRender = <PatientHome />;
     case "doctor":
-      pageToRender = <DoctorHome />;
+      router.replace("/doctor");
+      return;
+    case "patient":
+      router.replace("/patient");
+      return;
+    default:
+      return (
+        <>
+          <span>Uh oh... you're not logged in!</span>
+          <Login />
+        </>
+      );
   }
-
-  return (
-    <>
-      <Navbar />
-      <div className="antialiased bg-gray-200 p-6 h-screen">{pageToRender}</div>
-    </>
-  );
 };
 
 export default DashboardPage;

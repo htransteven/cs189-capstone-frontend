@@ -2,7 +2,6 @@ import "tailwindcss/tailwind.css";
 import { UserProvider as AuthProvider } from "@auth0/nextjs-auth0";
 import { UserProvider } from "../contexts/UserContext";
 import { ApiProvider } from "../contexts/APIClientContext";
-import AuthWrapper from "../components/AuthWrapper";
 import { createGlobalStyle } from "styled-components";
 import { pallete } from "../styles";
 
@@ -28,11 +27,9 @@ function MyApp({ Component, pageProps }) {
       <GlobalStyle />
       <AuthProvider>
         <UserProvider>
-          <AuthWrapper>
-            <ApiProvider>
-              <Component {...pageProps} />
-            </ApiProvider>
-          </AuthWrapper>
+          <ApiProvider>
+            <Component {...pageProps} />
+          </ApiProvider>
         </UserProvider>
       </AuthProvider>
     </>
