@@ -1,6 +1,6 @@
-import { PatientHome, DoctorHome } from "../../components";
-import Navbar from "../../components/Navbar";
-import { useRole } from "../../contexts/UserContext";
+import { PatientHome, DoctorHome } from "../components";
+import Navbar from "../components/Navbar";
+import { useRole } from "../contexts/UserContext";
 
 const DashboardPage = () => {
   const role = useRole();
