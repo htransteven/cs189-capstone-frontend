@@ -15,12 +15,7 @@ const DashboardPage = () => {
       router.replace("/patient");
       return;
     default:
-      return (
-        <>
-          <span>Uh oh... you're not logged in!</span>
-          <Login />
-        </>
-      );
+      return <Login />;
   }
 };
 
