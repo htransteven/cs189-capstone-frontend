@@ -26,7 +26,7 @@ export default async function handler(req, res) {
                       clearInterval(id)
 
                       //These two aren't really necessary but it gives everything in the query/log if it's needed
-                      res.send(response)
+                      // res.send(response)
                       console.log(response.results)
             
                       //Give to Frontend:This console log gives the date/timestamp of the log (ex.2022-01-11 20:38:44.087)
@@ -44,6 +44,13 @@ export default async function handler(req, res) {
                       resolve(response.results)
                       //console.log( (response.results[0][1]).value )
                       //console.log(text)
+
+                      const ret = {
+                        "timestamp": response.results[0][0].value,
+                        "input": obj.inputTranscript,
+                        "response": obj.botResponse,
+                      }
+                      res.send(ret)
                     }
                   }
                 )
