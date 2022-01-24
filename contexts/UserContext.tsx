@@ -23,7 +23,7 @@ export const useRole = (): Role => {
     case "doctor":
       return "doctor";
     default:
-      return null;
+      return "register";
   }
 };
 
