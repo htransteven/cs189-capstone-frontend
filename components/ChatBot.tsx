@@ -319,7 +319,7 @@ export const ChatMessage: React.FC<ChatEntry & { magnify: boolean }> = ({
     <MessageWrapper>
       <MessageMeta fromUser={sender === "user"}>
         <MessageTimestamp magnify={magnify}>
-          {format(timestamp, "hh:mm:ss aaaa")}-{`${magnify}`}
+          {format(timestamp, "hh:mm:ss aaaa")}
         </MessageTimestamp>
       </MessageMeta>
       <MessagePayload fromUser={sender === "user"} magnify={magnify}>
