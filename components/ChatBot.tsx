@@ -1,6 +1,7 @@
 import {
   PostTextCommand,
   DeleteSessionCommand,
+  PostTextCommandInput,
 } from "@aws-sdk/client-lex-runtime-service";
 import ReactDOM from "react-dom";
 import React, { useState, useRef, useEffect } from "react";
@@ -421,11 +422,12 @@ export const ChatBot = () => {
       { message, timestamp: Date.now(), sender: "user" },
     ]);
     setInput("");
-    const lexParams = {
+    const lexParams: PostTextCommandInput = {
       botAlias: process.env.NEXT_PUBLIC_BOT_ALIAS,
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
-      inputText: chatHistory.length === 1 ? `${userId}$${input}` : input,
+      inputText: input,
       userId: `${userId}`,
+      sessionAttributes: { userId },
     };
     setThinking(true);
     try {
