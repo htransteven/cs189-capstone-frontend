@@ -10,10 +10,8 @@ const DashboardPage = () => {
   switch (role) {
     case "doctor":
       router.replace("/doctor");
-      return;
     case "patient":
       router.replace("/patient");
-      return;
     default:
       return <Login />;
   }

@@ -4,6 +4,7 @@ import { AppointmentCard } from "../doctor/index";
 import { Appointment } from "../../api-utils/models";
 import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
+import { ChatBot } from "../../components";
 
 const PatientHome = () => {
   const user = useUser();
@@ -42,6 +43,7 @@ const PatientHome = () => {
             />
           ))}
       </div>
+      <ChatBot />
     </div>
   );
 };

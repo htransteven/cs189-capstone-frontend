@@ -8,6 +8,7 @@ import styled, { keyframes } from "styled-components";
 import { pallete } from "../styles";
 import { LexClientProvider, useLexClient } from "../contexts/LexClientContext";
 import { format, getUnixTime } from "date-fns";
+import { useUser } from "../contexts/UserContext";
 
 const Wrapper = styled.div`
   position: absolute;
@@ -312,10 +313,12 @@ export const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const lexClient = useLexClient();
 
+  const user = useUser();
+
   const [input, setInput] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [thinking, setThinking] = useState(false);
-  const [userId, setUserId] = useState(getUnixTime(new Date()));
+  const [userId, setUserId] = useState(user.sub);
   const chatLogRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -373,7 +376,6 @@ export const ChatBot = () => {
       console.log("Failed to delete session", err);
       return;
     }
-    setUserId(getUnixTime(new Date()));
     setChatHistory([]);
     setInput("");
   };
@@ -389,7 +391,7 @@ export const ChatBot = () => {
     const lexParams = {
       botAlias: process.env.NEXT_PUBLIC_BOT_ALIAS,
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
-      inputText: input,
+      inputText: chatHistory.length === 1 ? `${userId}$${input}` : input,
       userId: `${userId}`,
     };
     setThinking(true);

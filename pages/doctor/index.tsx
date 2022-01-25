@@ -6,6 +6,7 @@ import { Appointment, Doctor, Patient } from "../../api-utils/models";
 import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
 import Tag from "../../components/Tag";
+import { ChatBot } from "../../components";
 
 export const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
@@ -167,6 +168,7 @@ const DoctorHomePage = () => {
             />
           ))}
       </div>
+      <ChatBot />
     </div>
   );
 };
