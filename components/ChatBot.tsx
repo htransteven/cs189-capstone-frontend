@@ -314,7 +314,6 @@ export const ChatMessage: React.FC<ChatEntry & { magnify: boolean }> = ({
   lineItemSelected,
   magnify,
 }) => {
-  console.log(magnify);
   return (
     <MessageWrapper>
       <MessageMeta fromUser={sender === "user"}>
@@ -427,7 +426,7 @@ export const ChatBot = () => {
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
       inputText: input,
       userId: `${userId}`,
-      sessionAttributes: { userId },
+      sessionAttributes: { userId, sophie: "hello I did this" },
     };
     setThinking(true);
     try {
