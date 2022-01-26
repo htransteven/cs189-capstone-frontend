@@ -15,12 +15,12 @@ export const useRole = (): Role => {
   const user = useContext(UserContext);
   if (!user) return null;
 
-  const role = user["https://myapp/role"][0];
+  const role: string = user["https://myapp/role"][0];
 
-  switch (role) {
-    case "Patient":
+  switch (role.toLowerCase()) {
+    case "patient":
       return "patient";
-    case "Provider":
+    case "doctor":
       return "doctor";
     default:
       return null;
