@@ -1,10 +1,11 @@
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import React, { useEffect, useState } from "react";
-import { AppointmentCard } from "../doctor/index";
-import { Appointment } from "../../api-utils/models";
-import { useApi } from "../../contexts/APIClientContext";
-import { useRole, useUser } from "../../contexts/UserContext";
-import { ChatBot } from "../../components";
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import React, { useEffect, useState } from 'react';
+import { AppointmentCard } from '../doctor/index';
+import { Appointment } from '../../api-utils/models';
+import { useApi } from '../../contexts/APIClientContext';
+import { useRole, useUser } from '../../contexts/UserContext';
+import { ChatBot } from '../../components';
+import Navbar from '../../components/Navbar';
 
 const PatientHome = () => {
   const user = useUser();
@@ -31,20 +32,23 @@ const PatientHome = () => {
   }, [apiClient, user.sub, role]);
 
   return (
-    <div className="container mx-auto">
-      <div className="flex flex-wrap -mx-4">
-        {loading && "Loading appointments..."}
-        {!loading && !appointments && "No appointment data found"}
-        {appointments &&
-          appointments.map((appointment) => (
-            <AppointmentCard
-              key={`appointment-${appointment.appointment_id}`}
-              {...appointment}
-            />
-          ))}
+    <>
+      <Navbar />
+      <div className="container mx-auto">
+        <div className="flex flex-wrap -mx-4">
+          {loading && 'Loading appointments...'}
+          {!loading && !appointments && 'No appointment data found'}
+          {appointments &&
+            appointments.map((appointment) => (
+              <AppointmentCard
+                key={`appointment-${appointment.appointment_id}`}
+                {...appointment}
+              />
+            ))}
+        </div>
+        <ChatBot />
       </div>
-      <ChatBot />
-    </div>
+    </>
   );
 };
 
