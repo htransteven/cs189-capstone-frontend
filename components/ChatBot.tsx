@@ -426,7 +426,7 @@ export const ChatBot = () => {
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
       inputText: input,
       userId: `${userId}`,
-      sessionAttributes: { userId, sophie: "hello I did this" },
+      sessionAttributes: { userId },
     };
     setThinking(true);
     try {
