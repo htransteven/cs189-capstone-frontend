@@ -1,12 +1,13 @@
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { format, fromUnixTime } from "date-fns";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { Appointment, Doctor, Patient } from "../../api-utils/models";
-import { useApi } from "../../contexts/APIClientContext";
-import { useRole, useUser } from "../../contexts/UserContext";
-import Tag from "../../components/Tag";
-import { ChatBot } from "../../components";
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { format, fromUnixTime } from 'date-fns';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { Appointment, Doctor, Patient } from '../../api-utils/models';
+import { useApi } from '../../contexts/APIClientContext';
+import { useRole, useUser } from '../../contexts/UserContext';
+import Tag from '../../components/Tag';
+import { ChatBot } from '../../components';
+import Navbar from '../../components/Navbar';
 
 export const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
@@ -64,7 +65,7 @@ export const AppointmentCard: React.FC<Appointment> = ({
               <h2 className="font-bold text-white">
                 {format(
                   fromUnixTime(appointment_time),
-                  "EEEE, MM/dd/yyyy @ hh:mm a"
+                  'EEEE, MM/dd/yyyy @ hh:mm a'
                 )}
               </h2>
             </div>
@@ -73,15 +74,15 @@ export const AppointmentCard: React.FC<Appointment> = ({
             <div className="flex flex-col">
               <p className="text-purple-700 text-bold">Location</p>
               <p className="text-sm">
-                {loading && "Loading doctor data..."}
-                {!loading && !doctor && "Failed when finding doctor..."}
+                {loading && 'Loading doctor data...'}
+                {!loading && !doctor && 'Failed when finding doctor...'}
                 {doctor &&
                   `${doctor.location.address_line1} ${doctor.location.address_line2}, ${doctor.location.city}, ${doctor.location.state} ${doctor.location.postal_code}`}
               </p>
             </div>
             <div className="mt-3 flex flex-col">
-              {loading && "Loading patient data..."}
-              {!loading && !doctor && "Failed when finding patient data..."}
+              {loading && 'Loading patient data...'}
+              {!loading && !doctor && 'Failed when finding patient data...'}
               {patient && (
                 <>
                   <p className="text-purple-700 text-bold">
@@ -96,7 +97,7 @@ export const AppointmentCard: React.FC<Appointment> = ({
                   <div className="inline-flex">
                     <p className="text-sm text-gray-600 pr-1">Birthday: </p>
                     <p className="text-sm">
-                      {format(fromUnixTime(patient.birthday), "MM/dd/yyyy")}
+                      {format(fromUnixTime(patient.birthday), 'MM/dd/yyyy')}
                     </p>
                   </div>
                 </>
@@ -104,8 +105,8 @@ export const AppointmentCard: React.FC<Appointment> = ({
             </div>
 
             <p className="text-purple-700 text-bold mt-3">Tags</p>
-            {loading && "Loading patient data..."}
-            {!loading && !doctor && "Failed when finding patient data..."}
+            {loading && 'Loading patient data...'}
+            {!loading && !doctor && 'Failed when finding patient data...'}
             {patient && (
               <div className="flex">
                 <div className="flex flex-wrap mt-1">
@@ -156,20 +157,22 @@ const DoctorHomePage = () => {
   }, [apiClient, user.sub, role]);
 
   return (
-    <div className="container mx-auto">
-      <div className="flex flex-wrap -mx-4">
-        {loading && "Loading appointments..."}
-        {!loading && !appointments && "No appointment data found"}
-        {appointments &&
-          appointments.map((appointment) => (
-            <AppointmentCard
-              key={`appointment-${appointment.appointment_id}`}
-              {...appointment}
-            />
-          ))}
+    <>
+      <Navbar />
+      <div className="container mx-auto">
+        <div className="flex flex-wrap -mx-4">
+          {loading && 'Loading appointments...'}
+          {!loading && !appointments && 'No appointment data found'}
+          {appointments &&
+            appointments.map((appointment) => (
+              <AppointmentCard
+                key={`appointment-${appointment.appointment_id}`}
+                {...appointment}
+              />
+            ))}
+        </div>
       </div>
-      <ChatBot />
-    </div>
+    </>
   );
 };
 
