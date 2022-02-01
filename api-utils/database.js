@@ -1,5 +1,6 @@
 const configureDatabase = require('./configure_database');
 var ddb = configureDatabase();
+var AWS = require('aws-sdk');
 
 module.exports = (table_name, params) => {
   if (!params.appointment_id && (table_name == "appointments" || table_name == "general_consults")) {
@@ -19,10 +20,10 @@ module.exports = (table_name, params) => {
       params['sex'] = "";
     }
     if (!params.active_medications) {
-      params['active_medications'] = "[]";
+      params['active_medications'] = [];
     }
     if (!params.preexisting_conditions) {
-      params['preexisting_conditions'] = "[{}]";
+      params['preexisting_conditions'] = [{}];
     }
     if (!params.birthday) {
       params['birthday'] = "";
@@ -53,15 +54,8 @@ module.exports = (table_name, params) => {
 
   var table_info_patient = {
     TableName: table_name,
-    Item: {
-      'patient_id': {S: params.patient_id},
-      'first_name': {S: params.first_name},
-      'last_name': {S: params.last_name},
-      'sex': {S: params.sex},
-      'active_medications': {S: params.active_medications},
-      'preexisting_conditions': {S: params.preexisting_conditions},
-      'birthday': {S: params.birthday},
-    }
+    Item: 
+      AWS.DynamoDB.Converter.marshall(params)
   }
   var table_info_appointment = {
     TableName: table_name,
