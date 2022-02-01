@@ -17,7 +17,7 @@ export const useRole = (): Role => {
 
   const role: string = user["https://myapp/role"][0];
 
-  switch (role.toLowerCase()) {
+  switch (role && role.toLowerCase()) {
     case "patient":
       return "patient";
     case "doctor":
