@@ -22,35 +22,39 @@ export default async function handler(req, res) {
                       reject(err)
                       return
                     }
+                    
+                    var ret_arr = [];
                     if (response.status !== "Running") {
                       clearInterval(id)
 
-                      //These two aren't really necessary but it gives everything in the query/log if it's needed
-                      // res.send(response)
-                      console.log(response.results)
-            
-                      //Give to Frontend:This console log gives the date/timestamp of the log (ex.2022-01-11 20:38:44.087)
-                      console.log((response.results[0][0]).value)
-                      
-                      const text =String((response.results[0][1]).value)
-                      const obj=JSON.parse((text))
-            
-                      //Give to Frontend:This console log gives the user-input/message to the bot
-                      console.log(obj.inputTranscript)
-            
-                      //Give to Frontend:This console log gives the bot-response
-                      console.log(obj.botResponse)
+                      let length = response.results.length;
+                      for(let i=length-1; i>=0; i--){
+                        //Give to Frontend:This console log gives the date/timestamp of the log (ex.2022-01-11 20:38:44.087)
+                        console.log("Timestamp:")
+                        console.log((response.results[i][0]).value)
+
+                        const text =String((response.results[i][1]).value)
+                        const obj=JSON.parse((text))
+
+                        //Give to Frontend:This console log gives the user-input/message to the bot
+                        console.log("User Input:")
+                        console.log(obj.inputTranscript)
+
+                        //Give to Frontend:This console log gives the user-input/message to the bot
+                        console.log("Bot Response:")
+                        console.log(obj.botResponse)
+
+                        const ret = {
+                          "timestamp": response.results[i][0].value,
+                          "input": obj.inputTranscript,
+                          "response": obj.botResponse,
+                        }
+                        ret_arr.push(ret);
+                      }
                       
                       resolve(response.results)
-                      //console.log( (response.results[0][1]).value )
-                      //console.log(text)
 
-                      const ret = {
-                        "timestamp": response.results[0][0].value,
-                        "input": obj.inputTranscript,
-                        "response": obj.botResponse,
-                      }
-                      res.send(ret)
+                      res.send(ret_arr)
                     }
                   }
                 )
