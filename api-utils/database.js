@@ -3,111 +3,60 @@ var ddb = configureDatabase();
 var AWS = require('aws-sdk');
 
 module.exports = (table_name, params) => {
-  if (!params.appointment_id && (table_name == "appointments" || table_name == "general_consults")) {
+  if (!params.appointment_id && (table_name == "appointments")) {
     console.log("Error: missing required appointment_id key");
-  } else if (!params.patient_id) {
+  }
+  if (!params.doctor_id && (table_name == "doctors")) {
+    console.log("Error: missing required doctor_id key");
+  }
+  if (!params.patient_id && (table_name == "patients" || table_name == "appointments")) {
     console.log("Error: missing required patient_id key");
   }
 
-  if (table_name === "patients") {
-    if (!params.first_name) {
-      params['first_name'] = "";
-    }
-    if (!params.last_name) {
-      params['last_name'] = "";
-    }
-    if (!params.sex) {
-      params['sex'] = "";
-    }
-    if (!params.active_medications) {
-      params['active_medications'] = [];
-    }
-    if (!params.preexisting_conditions) {
-      params['preexisting_conditions'] = [{}];
-    }
-    if (!params.birthday) {
-      params['birthday'] = "";
-    }
-  }
-  if (table_name === "appointments") {
-    if (!params.appointment_type) {
-      params['appointment_type'] = "";
-    }
-    if (!params.doctor) {
-      params['doctor'] = "";
-    }
-    if (!params.appointment_time) {
-      params['appointment_time'] = "";
-    }
-  }
-  if (table_name === "general_consults") {
-    if (!params.doctor_diagnosis) {
-      params['doctor_diagnosis'] = "";
-    }
-    if (!params.symptoms) {
-      params['symptoms'] = "[{}]";
-    }
-    if (!params.initial_diagnosis) {
-      params['initial_diagnosis'] = "";
-    }
-  }
+  ddb.describeTable({TableName: table_name}, function(err, table_data) {
+    if (err) {
+      console.log("Error", err);
+    } else {
+      // get marshalled table keys
+      var table_keys = table_data.Table.KeySchema;
+      var unmarshalled_keys = {};
+      var key_name;
+      for (let i = 0; i < table_keys.length; i++) {
+        key_name = table_keys[i].AttributeName;
+        unmarshalled_keys[key_name] = params[key_name];
+      }
+      var marshalled_keys = AWS.DynamoDB.Converter.marshall(unmarshalled_keys);
 
-  var table_info_patient = {
-    TableName: table_name,
-    Item: 
-      AWS.DynamoDB.Converter.marshall(params)
-  }
-  var table_info_appointment = {
-    TableName: table_name,
-    Item: {
-      'appointment_id': {N: params.appointment_id},
-      'patient_id': {S: params.patient_id},
-      'appointment_type': {S: params.appointment_type},
-      'doctor': {S: params.doctor},
-      'appointment_time': {S: params.appointment_time},
-    }
-  }
-  var table_info_general_consult= {
-    TableName: table_name,
-    Item: {
-      'appointment_id': {N: params.appointment_id},
-      'patient_id': {S: params.patient_id},
-      'doctor_diagnosis': {S: params.doctor_diagnosis},
-      'symptoms': {S: params.symptoms},
-      'initial_diagnosis': {S: params.initial_diagnosis},
-    }
-  }
+      // get update expression and add expression attribute values
+      var update_expression = "set";
+      var expression_attribute_values = {};
+      for (const table_item of Object.keys(params)) {
+        if (!(table_item in marshalled_keys)) {
+          // update expression with more values to add in
+          update_expression = update_expression.concat(" ", table_item, " = :", table_item, ",");
+          // make sure these values are defined in expression attribute values
+          expression_attribute_values[":".concat(table_item)] = params[table_item];
+        }
+      }
+      // remove the last extra comma in the list
+      update_expression = update_expression.substring(0, update_expression.length - 1);
+      var marshalled_expression_attribute_values = AWS.DynamoDB.Converter.marshall(expression_attribute_values);
 
-  switch (table_name) {
-    case 'patients':
-      ddb.putItem(table_info_patient, function(err, data) {
+      // compile information for the updateitem param
+      var table_info = {
+        TableName: table_name,
+        Key: marshalled_keys,
+        UpdateExpression: update_expression,
+        ExpressionAttributeValues: marshalled_expression_attribute_values,
+        ReturnValues: "ALL_NEW",
+      }
+      ddb.updateItem(table_info, function(err, data) {
         if (err) {
           console.log("Error", err);
         } else {
           console.log("Success", data);
         }
       });
-      break;
-    case 'appointments':
-      ddb.putItem(table_info_appointment, function(err, data) {
-        if (err) {
-          console.log("Error", err);
-        } else {
-          console.log("Success", data);
-        }
-      });
-      break;
-    case 'general_consults':
-      ddb.putItem(table_info_general_consult, function(err, data) {
-        if (err) {
-          console.log("Error", err);
-        } else {
-          console.log("Success", data);
-        }
-      });
-      break;
-    default:
-      console.log(`Table ${table_name} does not exist`);
-      break;
-  }
+    }
+  });
 }
