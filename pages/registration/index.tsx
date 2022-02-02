@@ -1,12 +1,22 @@
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import React, { ReactElement, useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
-import Registration from "../../components/Registration";
-import { useRole, useUser } from "../../contexts/UserContext";
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { useRouter } from 'next/router';
+import React, { ReactElement, useEffect } from 'react';
+import Navbar from '../../components/Navbar';
+import Registration from '../../components/Registration';
+import { useRole } from '../../contexts/UserContext';
 
 const RegistrationPage = (): ReactElement => {
-  const user = useUser();
-  console.log('user is ', user)
+  const role = useRole();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (role === 'doctor') {
+      router.push('/doctor');
+    }
+    if (role === 'patient') {
+      router.push('/patient');
+    }
+  }, [role, router]);
 
   return (
     <>

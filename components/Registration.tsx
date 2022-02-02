@@ -22,6 +22,7 @@ const Registration = (): ReactElement => {
     patient_id: user.sub,
     first_name: user.name,
     last_name: user.name,
+    email: user.email,
     birthday: -1,
     sex: 'N/A',
     active_medications: [],
