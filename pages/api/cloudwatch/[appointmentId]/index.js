@@ -1,7 +1,7 @@
 var parseJSON = require('date-fns/parseJSON')
 var getUnixTime = require('date-fns/getUnixTime')
 
-const configureCloudwatch = require("../../../../api/configure_cloudwatch");
+const configureCloudwatch = require("../../../../api-utils/configure_cloudwatch");
 var cw = configureCloudwatch();
 
 export default async function handler(req, res) {
