@@ -1,4 +1,4 @@
-const configureDatabase = require("../../../../api/configure_database");
+const configureDatabase = require("../../../../api-utils/configure_database");
 var ddb = configureDatabase();
 var AWS = require("aws-sdk");
 
@@ -96,7 +96,7 @@ export default function handler(req, res) {
           } else {
             res.status(200).json(data);
             console.log(
-              "Success: deleted item from table(general_consults)",
+              "Success: deleted item from table(appointments)",
               JSON.stringify(data)
             );
           }

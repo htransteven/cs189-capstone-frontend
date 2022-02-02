@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import { UserProfile, useUser as useAuthUser } from "@auth0/nextjs-auth0";
 import { Login } from "../components/Login";
-import { Role } from "../api/models";
+import { Role } from "../api-utils/models";
 
 const UserContext = createContext(null);
 
@@ -13,24 +13,22 @@ export const useUser = (): UserProfile => {
 
 export const useRole = (): Role => {
   const user = useContext(UserContext);
-  const role = user["https://myapp/role"][0];
+  if (!user) return null;
 
-  switch (role) {
-    case "Patient":
+  const role: string = user["https://myapp/role"][0];
+
+  switch (role && role.toLowerCase()) {
+    case "patient":
       return "patient";
-    case "Provider":
+    case "doctor":
       return "doctor";
     default:
-      return null;
+      return "register";
   }
 };
 
 export const UserProvider = ({ children }) => {
   const { user } = useAuthUser();
-
-  if (!user) {
-    return <Login />;
-  }
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };

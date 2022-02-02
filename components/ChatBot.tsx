@@ -1,13 +1,15 @@
 import {
   PostTextCommand,
   DeleteSessionCommand,
+  PostTextCommandInput,
 } from "@aws-sdk/client-lex-runtime-service";
 import ReactDOM from "react-dom";
 import React, { useState, useRef, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { pallete } from "../styles";
 import { LexClientProvider, useLexClient } from "../contexts/LexClientContext";
-import { format, getUnixTime } from "date-fns";
+import { format } from "date-fns";
+import { useUser } from "../contexts/UserContext";
 
 const Wrapper = styled.div`
   position: absolute;
@@ -17,6 +19,8 @@ const Wrapper = styled.div`
   flex-flow: row nowrap;
   align-items: flex-end;
   justify-content: flex-end;
+  width: calc(100vw - 60px);
+  height: calc(100vh - 60px);
 `;
 
 const Button = styled.div<{ isOpen: boolean }>`
@@ -39,20 +43,22 @@ const Button = styled.div<{ isOpen: boolean }>`
   }
 `;
 
-const ChatWindow = styled.div<{ isOpen: boolean }>`
+const ChatWindow = styled.div<{ isOpen: boolean; magnify: boolean }>`
   display: flex;
   flex-flow: column nowrap;
-  width: 400px;
-  height: 600px;
+  width: 100%;
+  height: 100%;
   background-color: ${pallete.chatbot.background};
   border-radius: 20px 20px 0 20px;
   box-shadow: ${({ isOpen }) =>
     isOpen ? "0px 2px 4px 3px rgb(100, 100, 100, 25%)" : "none"};
 
   overflow: hidden;
-  max-width: ${({ isOpen }) => (isOpen ? "1000px" : "0px")};
-  max-height: ${({ isOpen }) => (isOpen ? "1000px" : "0px")};
-  transition: 0.25s all ease-out;
+  max-width: ${({ isOpen, magnify }) =>
+    isOpen ? (magnify ? "100vw" : "400px") : "0px"};
+  max-height: ${({ isOpen, magnify }) =>
+    isOpen ? (magnify ? "100vh" : "600px") : "0px"};
+  transition: 0.3s all ease-out;
 `;
 
 export interface LineItem {
@@ -107,7 +113,30 @@ const ChatFormHeader = styled.div`
   }
 `;
 
+const ChatWindowControls = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center; ;
+`;
+
 const ResetChatButton = styled.div`
+  color: ${pallete.white};
+  font-weight: 600;
+  border: 2px solid ${pallete.white};
+  padding: 4px 16px;
+  border-radius: 30px;
+  opacity: 0.6;
+  transition: 0.15s opacity linear;
+  margin-right: 10px;
+
+  &:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
+`;
+
+const ExpandChatButton = styled.div`
   color: ${pallete.white};
   font-weight: 600;
   border: 2px solid ${pallete.white};
@@ -188,11 +217,11 @@ const MessageMeta = styled.div<{ fromUser: boolean }>`
   margin-bottom: 3px;
 `;
 
-const MessageTimestamp = styled.span`
+const MessageTimestamp = styled.span<{ magnify: boolean }>`
   color: ${pallete.chatbot.secondaryText};
-  font-size: 0.7rem;
+  font-size: ${({ magnify }) => (magnify ? "1rem" : "0.7rem")};
 `;
-const MessagePayload = styled.pre<{ fromUser: boolean }>`
+const MessagePayload = styled.pre<{ fromUser: boolean; magnify: boolean }>`
   margin: 0;
   font-family: inherit;
   white-space: pre-wrap;
@@ -205,6 +234,7 @@ const MessagePayload = styled.pre<{ fromUser: boolean }>`
     fromUser ? "15px 0px 15px 15px" : "0px 15px 15px 15px"};
   align-self: ${({ fromUser }) => (fromUser ? "flex-end" : "flex-start")};
   max-width: 80%;
+  font-size: ${({ magnify }) => (magnify ? "1.2rem" : "1rem")};
 `;
 
 const blinkingAnimation = keyframes`
@@ -276,21 +306,24 @@ const PayloadLineItem = styled.div`
   }
 `;
 
-export const ChatMessage: React.FC<ChatEntry> = ({
+export const ChatMessage: React.FC<ChatEntry & { magnify: boolean }> = ({
   message,
   timestamp,
   sender,
   lineItems,
   lineItemSelected,
+  magnify,
 }) => {
   return (
     <MessageWrapper>
       <MessageMeta fromUser={sender === "user"}>
-        <MessageTimestamp>
+        <MessageTimestamp magnify={magnify}>
           {format(timestamp, "hh:mm:ss aaaa")}
         </MessageTimestamp>
       </MessageMeta>
-      <MessagePayload fromUser={sender === "user"}>{message}</MessagePayload>
+      <MessagePayload fromUser={sender === "user"} magnify={magnify}>
+        {message}
+      </MessagePayload>
       {!lineItemSelected && lineItems?.length > 0 && (
         <PayloadLineItemHeader>Please select an option</PayloadLineItemHeader>
       )}
@@ -312,10 +345,13 @@ export const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const lexClient = useLexClient();
 
+  const user = useUser();
+
   const [input, setInput] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [thinking, setThinking] = useState(false);
-  const [userId, setUserId] = useState(getUnixTime(new Date()));
+  const [magnify, setMagnify] = useState(false);
+  const [userId] = useState(user.sub);
   const chatLogRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -373,7 +409,6 @@ export const ChatBot = () => {
       console.log("Failed to delete session", err);
       return;
     }
-    setUserId(getUnixTime(new Date()));
     setChatHistory([]);
     setInput("");
   };
@@ -386,11 +421,12 @@ export const ChatBot = () => {
       { message, timestamp: Date.now(), sender: "user" },
     ]);
     setInput("");
-    const lexParams = {
+    const lexParams: PostTextCommandInput = {
       botAlias: process.env.NEXT_PUBLIC_BOT_ALIAS,
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
       inputText: input,
       userId: `${userId}`,
+      sessionAttributes: { userId },
     };
     setThinking(true);
     try {
@@ -442,7 +478,7 @@ export const ChatBot = () => {
   return ReactDOM.createPortal(
     <Wrapper>
       <LexClientProvider>
-        <ChatWindow isOpen={isOpen} ref={containerRef}>
+        <ChatWindow isOpen={isOpen} magnify={magnify} ref={containerRef}>
           <ChatForm
             onSubmit={(e) => {
               e.preventDefault();
@@ -451,13 +487,22 @@ export const ChatBot = () => {
           >
             <ChatFormHeader>
               <span>Scribe Chat Bot</span>
-              <ResetChatButton onClick={handleResetButtonClick}>
-                Reset
-              </ResetChatButton>
+              <ChatWindowControls>
+                <ResetChatButton onClick={handleResetButtonClick}>
+                  Reset
+                </ResetChatButton>
+                <ExpandChatButton onClick={() => setMagnify((prev) => !prev)}>
+                  Expand
+                </ExpandChatButton>
+              </ChatWindowControls>
             </ChatFormHeader>
             <ChatHistory ref={chatLogRef}>
               {chatHistory.map((message, index) => (
-                <ChatMessage key={`message-${index}`} {...message} />
+                <ChatMessage
+                  key={`message-${index}`}
+                  {...message}
+                  magnify={magnify}
+                />
               ))}
               {thinking && <ThinkingAnimation />}
             </ChatHistory>
