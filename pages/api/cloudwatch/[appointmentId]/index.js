@@ -1,3 +1,6 @@
+var parseJSON = require('date-fns/parseJSON')
+var getUnixTime = require('date-fns/getUnixTime')
+
 const configureCloudwatch = require("../../../../api/configure_cloudwatch");
 var cw = configureCloudwatch();
 
@@ -31,7 +34,9 @@ export default async function handler(req, res) {
                       for(let i=length-1; i>=0; i--){
                         //Give to Frontend:This console log gives the date/timestamp of the log (ex.2022-01-11 20:38:44.087)
                         console.log("Timestamp:")
-                        console.log((response.results[i][0]).value)
+                        var the_res = (response.results[i][0]).value;
+                        the_res = the_res.replace(" ", "T");
+                        console.log(getUnixTime(parseJSON(the_res)));
 
                         const text =String((response.results[i][1]).value)
                         const obj=JSON.parse((text))
@@ -45,7 +50,7 @@ export default async function handler(req, res) {
                         console.log(obj.botResponse)
 
                         const ret = {
-                          "timestamp": response.results[i][0].value,
+                          "timestamp": getUnixTime(parseJSON(the_res)),
                           "input": obj.inputTranscript,
                           "response": obj.botResponse,
                         }
