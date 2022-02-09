@@ -8,11 +8,13 @@ import {
   Doctor,
   Patient,
   Comment,
+  ChatLogs,
 } from "../../../api-utils/models";
 import Navbar from "../../../components/Navbar";
 import { pallete } from "../../../styles";
 import { format, fromUnixTime, getUnixTime } from "date-fns";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { ChatMessage } from "../../../components";
 
 const Banner = styled.div`
   background-color: ${pallete.purple};
@@ -25,40 +27,25 @@ const Wrapper = styled.div`
   padding: 30px;
 `;
 
-const RowLayout = styled.div<{ gap?: number }>`
-  display: flex;
-  flex-flow: row nowrap;
-
-  & > * {
-    margin: 0 ${({ gap }) => gap / 2}px;
-
-    &:first-child {
-      margin-left: 0;
-    }
-    &:last-child {
-      margin-right: 0;
-    }
-  }
+const RowLayout = styled.div<{ gap?: number; pair?: boolean }>`
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
+  grid-gap: ${({ gap }) => gap}px;
+  width: ${({ pair }) => (pair ? "fit-content" : "100%")};
 `;
 
-const ColumnLayout = styled.div<{ gap?: number }>`
-  display: flex;
-  flex-flow: column nowrap;
-
-  & > * {
-    margin: ${({ gap }) => gap / 2}px 0;
-
-    &:first-child {
-      margin-top: 0;
-    }
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+const ColumnLayout = styled.div<{ gap?: number; pair?: boolean }>`
+  display: grid;
+  grid-auto-flow: rows;
+  grid-auto-rows: auto;
+  grid-gap: ${({ gap }) => gap}px;
+  width: ${({ pair }) => (pair ? "fit-content" : "100%")};
 `;
 
 const Card = styled.div`
-  padding: 35px;
+  width: 100%;
+  padding: 20px;
   background-color: ${pallete.white};
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   border-radius: 5px;
@@ -102,6 +89,32 @@ const Value = styled.div`
   letter-spacing: 0.05rem;
 `;
 
+const ChatHistory = styled.div`
+  display: flex;
+  height: auto;
+  width: 100%;
+  flex-flow: column nowrap;
+  overflow-y: scroll;
+  padding: 20px 20px 20px 20px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  background-color: ${pallete.white};
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${pallete.chatbot.secondaryText};
+    border-radius: 10px;
+  }
+`;
+
 const PatientInfo: FunctionComponent<Patient> = ({
   patient_id,
   first_name,
@@ -113,27 +126,27 @@ const PatientInfo: FunctionComponent<Patient> = ({
   return (
     <Card>
       <CardTitle>Patient Info</CardTitle>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Patient ID</Label>
         <Value>{patient_id}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>First Name</Label>
         <Value>{first_name}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Last Name</Label>
         <Value>{last_name}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Birthday</Label>
         <Value>{format(fromUnixTime(birthday), "MM/dd/yyyy")}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Sex</Label>
         <Value style={{ textTransform: "capitalize" }}>{sex}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Pre-existing Conditions</Label>
         <ColumnLayout gap={10}>
           {preexisting_conditions.map((condition) => (
@@ -154,58 +167,58 @@ const AppointmentInfo: React.FC<Appointment & { doctor: Doctor }> = ({
   return (
     <Card>
       <CardTitle>Appointment Info</CardTitle>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Appointment ID</Label>
         <Value>{appointment_id}</Value>
       </RowLayout>
       <RowLayout gap={20}>
-        <RowLayout>
+        <RowLayout pair={true}>
           <Label>Date</Label>
           <Value>{format(fromUnixTime(appointment_time), "MM/dd/yyyy")}</Value>
         </RowLayout>
-        <RowLayout>
+        <RowLayout pair={true}>
           <Label>Time</Label>
           <Value>{format(fromUnixTime(appointment_time), "hh:mm:ss a")}</Value>
         </RowLayout>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Type</Label>
         <Value>{appointment_type}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Doctor</Label>
         <Value>
           {doctor.first_name} {doctor.last_name}
         </Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Specialty</Label>
         <Value style={{ textTransform: "capitalize" }}>
           {doctor.specialty}
         </Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Address Line 1</Label>
         <Value>{doctor.location.address_line1}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Address Line 2</Label>
         <Value>{doctor.location.address_line2}</Value>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Postal Code</Label>
         <Value>{doctor.location.postal_code}</Value>
       </RowLayout>
       <RowLayout gap={30}>
-        <RowLayout>
+        <RowLayout pair={true}>
           <Label>City</Label>
           <Value>{doctor.location.city}</Value>
         </RowLayout>
-        <RowLayout>
+        <RowLayout pair={true}>
           <Label>State</Label>
           <Value>{doctor.location.state}</Value>
         </RowLayout>
-        <RowLayout>
+        <RowLayout pair={true}>
           <Label>Country</Label>
           <Value>{doctor.location.country}</Value>
         </RowLayout>
@@ -222,23 +235,25 @@ const DiagnosisInfo: React.FC<Appointment> = ({
   return (
     <Card>
       <CardTitle>Diagnosis Info</CardTitle>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Symptoms</Label>
         <ColumnLayout gap={10}>
-          {symptoms.map((symptoms) => (
-            <Value key={`symp-${symptoms.id}`}>{symptoms.label}</Value>
-          ))}
+          {symptoms &&
+            symptoms.map((symptoms) => (
+              <Value key={`symp-${symptoms.id}`}>{symptoms.label}</Value>
+            ))}
         </ColumnLayout>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Initial Diagnosis</Label>
         <ColumnLayout gap={10}>
-          {initial_diagnosis.map((diagnosis, index) => (
-            <Value key={`id-${index}`}>{diagnosis}</Value>
-          ))}
+          {initial_diagnosis &&
+            initial_diagnosis.map((diagnosis, index) => (
+              <Value key={`id-${index}`}>{diagnosis}</Value>
+            ))}
         </ColumnLayout>
       </RowLayout>
-      <RowLayout>
+      <RowLayout pair={true}>
         <Label>Doctor's Diagnosis</Label>
         <Value>{doctor_diagnosis}</Value>
       </RowLayout>
@@ -265,6 +280,7 @@ const CommentButton = styled.button`
   color: ${pallete.white};
   background-color: ${pallete.purple};
   font-size: 0.8rem;
+  width: fit-content;
 `;
 
 const DeleteCommentButton = styled.button`
@@ -296,10 +312,13 @@ const CommentsSection: React.FC<{
     <Card>
       <form onSubmit={handleSubmit}>
         <CardTitle>Comments</CardTitle>
-        <ColumnLayout gap={15}>
+        <ColumnLayout
+          gap={15}
+          style={{ maxHeight: "200px", overflowY: "scroll" }}
+        >
           {comments.map((comment, index) => (
             <ColumnLayout key={`id-${index}`} gap={5}>
-              <RowLayout gap={5} style={{ alignItems: "center" }}>
+              <RowLayout gap={5} style={{ alignItems: "center" }} pair={true}>
                 <Label>
                   {`${comment.role} - `}
                   {format(fromUnixTime(comment.time), "MM/dd/yyyy hh:mm:ss a")}
@@ -314,14 +333,14 @@ const CommentsSection: React.FC<{
               <Value>{comment.message}</Value>
             </ColumnLayout>
           ))}
-          <RowLayout gap={10}>
-            <CommentInput
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-            <CommentButton type={"submit"}>Add Comment</CommentButton>
-          </RowLayout>
         </ColumnLayout>
+        <RowLayout gap={10} style={{ gridTemplateColumns: "1fr auto" }}>
+          <CommentInput
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <CommentButton type={"submit"}>Add Comment</CommentButton>
+        </RowLayout>
       </form>
     </Card>
   );
@@ -335,6 +354,7 @@ const AppointmentPage = () => {
   const [appointment, setAppointment] = useState<Appointment>(null);
   const [patient, setPatient] = useState<Patient>(null);
   const [doctor, setDoctor] = useState<Doctor>(null);
+  const [chatLogs, setChatLogs] = useState<ChatLogs[]>(null);
 
   useEffect(() => {
     const getAppointment = async () => {
@@ -353,18 +373,27 @@ const AppointmentPage = () => {
         alert(
           `no patient found for appointment ${appt.appointment_id} with patient id = ${appt.patient_id}`
         );
-        return;
+      } else {
+        setPatient(pat);
       }
-      setPatient(pat);
 
       const doc = await apiClient.doctors.get(appt.doctor_id);
       if (!doc) {
         alert(
           `no doc found for appointment ${appt.appointment_id} with doctor id = ${appt.doctor_id}`
         );
-        return;
+      } else {
+        setDoctor(doc);
       }
-      setDoctor(doc);
+
+      const logs = await apiClient.appointments.getChatLogs(
+        appt.appointment_id
+      );
+      if (!logs) {
+        alert(`no chat logs found for appointment ${appt.appointment_id}`);
+      } else {
+        setChatLogs(logs);
+      }
     };
 
     getAppointment();
@@ -404,28 +433,58 @@ const AppointmentPage = () => {
   };
 
   return (
-    <>
+    <div style={{ height: "100vh" }}>
       <Navbar />
       <Banner>Appointment #{appointmentId}</Banner>
       <Wrapper>
         {loading && <div>Searching for appointment #{appointmentId}</div>}
         {!loading && !appointment && <div>Appointment not found</div>}
         {appointment && patient && doctor && (
-          <ColumnLayout gap={15}>
-            <RowLayout gap={15}>
-              <PatientInfo {...patient} />
-              <AppointmentInfo {...appointment} doctor={doctor} />
-              <DiagnosisInfo {...appointment} />
-            </RowLayout>
-            <CommentsSection
-              comments={appointment.comments}
-              addComment={addComment}
-              deleteComment={deleteComment}
-            />
-          </ColumnLayout>
+          <RowLayout
+            gap={15}
+            style={{
+              height: "calc(100vh - 200px - 60px)",
+            }}
+          >
+            <ColumnLayout gap={15}>
+              <RowLayout gap={15}>
+                <PatientInfo {...patient} />
+                <AppointmentInfo {...appointment} doctor={doctor} />
+                <DiagnosisInfo {...appointment} />
+              </RowLayout>
+              <CommentsSection
+                comments={appointment.comments}
+                addComment={addComment}
+                deleteComment={deleteComment}
+              />
+            </ColumnLayout>
+            <ChatHistory>
+              <CardTitle>Chat Logs</CardTitle>
+              {!chatLogs && <span>Loading chat log</span>}
+              {chatLogs &&
+                chatLogs.map((log, index) => (
+                  <>
+                    <ChatMessage
+                      key={`message-${index}`}
+                      message={log.input}
+                      sender={"user"}
+                      timestamp={log.timestamp}
+                      magnify={false}
+                    />
+                    <ChatMessage
+                      key={`message-${index}`}
+                      message={log.response}
+                      sender={"bot"}
+                      timestamp={log.timestamp}
+                      magnify={false}
+                    />
+                  </>
+                ))}
+            </ChatHistory>
+          </RowLayout>
         )}
       </Wrapper>
-    </>
+    </div>
   );
 };
 

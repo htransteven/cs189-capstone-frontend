@@ -1,5 +1,5 @@
-import { Appointment, Doctor, Patient, Role } from './models';
-import axios from 'axios';
+import { Appointment, ChatLogs, Doctor, Patient, Role } from "./models";
+import axios from "axios";
 
 export interface APIClient {
   appointments: {
@@ -9,6 +9,7 @@ export interface APIClient {
       changes: Partial<Appointment>
     ) => Promise<Appointment | null>;
     getAll: (id: string, role: Role) => Promise<Appointment[] | null>;
+    getChatLogs: (appointmentId: number) => Promise<ChatLogs[] | null>;
   };
   patients: {
     get: (patientId: string) => Promise<Patient | null>;
@@ -32,6 +33,16 @@ export const createClient = (): APIClient => {
 
         return appointment as Appointment;
       },
+      getChatLogs: async (appointmentId: number) => {
+        const res = await fetch(`/api/appointments/${appointmentId}/chatlogs`);
+        if (!res.ok) {
+          return null;
+        }
+
+        const logs = await res.json();
+
+        return logs as ChatLogs[];
+      },
       getAll: async (id: string, role: Role) => {
         const res = await fetch(`/api/${role}/${id}/appointments`);
         if (!res.ok) {
@@ -44,7 +55,7 @@ export const createClient = (): APIClient => {
       },
       put: async (appointmentId: number, changes: Partial<Appointment>) => {
         const res = await fetch(`/api/appointments/${appointmentId}`, {
-          method: 'PUT',
+          method: "PUT",
           body: JSON.stringify(changes),
         });
         if (!res.ok) {
@@ -65,7 +76,10 @@ export const createClient = (): APIClient => {
 
         const patient = await res.json();
 
-        return patient as Patient;
+        return {
+          ...patient,
+          birthday: parseInt(patient.birthday, 10),
+        } as Patient;
       },
       post: async (patient: Patient, picture: string) => {
         const res = await axios.post(
@@ -75,13 +89,13 @@ export const createClient = (): APIClient => {
           }
         );
 
-        if (res.statusText !== 'Created') {
+        if (res.statusText !== "Created") {
           return null;
         }
-        if (res.data.message === 'successfully registered') {
-          const res = await axios.post('/api/patient', patient);
+        if (res.data.message === "successfully registered") {
+          const res = await axios.post("/api/patient", patient);
 
-          if (res.statusText !== 'OK') {
+          if (res.statusText !== "OK") {
             return null;
           }
 

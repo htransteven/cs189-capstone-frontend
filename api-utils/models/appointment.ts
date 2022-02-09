@@ -1,5 +1,11 @@
 import { Role } from "./misc";
 
+export interface ChatLogs {
+  timestamp: number;
+  input: string;
+  response: string;
+}
+
 export interface Symptom {
   id: string;
   label: string;
