@@ -24,7 +24,7 @@ const Banner = styled.div`
 `;
 
 const Wrapper = styled.div`
-  padding: 30px;
+  padding: 30px 30px 0px 30px;
 `;
 
 const RowLayout = styled.div<{ gap?: number; pair?: boolean }>`
@@ -37,7 +37,7 @@ const RowLayout = styled.div<{ gap?: number; pair?: boolean }>`
 
 const ColumnLayout = styled.div<{ gap?: number; pair?: boolean }>`
   display: grid;
-  grid-auto-flow: rows;
+  grid-auto-flow: row;
   grid-auto-rows: auto;
   grid-gap: ${({ gap }) => gap}px;
   width: ${({ pair }) => (pair ? "fit-content" : "100%")};
@@ -65,7 +65,6 @@ const Card = styled.div`
 const CardTitle = styled.span`
   display: flex;
   font-size: 1.2rem;
-  margin-bottom: 15px;
   font-weight: 700;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
@@ -310,7 +309,16 @@ const CommentsSection: React.FC<{
 
   return (
     <Card>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          minHeight: "0px",
+          height: "100%",
+          display: "grid",
+          gridTemplateRows: "auto 1fr auto",
+          gridGap: "10px",
+        }}
+      >
         <CardTitle>Comments</CardTitle>
         <ColumnLayout
           gap={15}
@@ -440,13 +448,13 @@ const AppointmentPage = () => {
         {loading && <div>Searching for appointment #{appointmentId}</div>}
         {!loading && !appointment && <div>Appointment not found</div>}
         {appointment && patient && doctor && (
-          <RowLayout
-            gap={15}
-            style={{
-              height: "calc(100vh - 200px - 60px)",
-            }}
-          >
-            <ColumnLayout gap={15}>
+          <RowLayout gap={15}>
+            <ColumnLayout
+              gap={15}
+              style={{
+                height: "calc(100vh - 200px - 60px)",
+              }}
+            >
               <RowLayout gap={15}>
                 <PatientInfo {...patient} />
                 <AppointmentInfo {...appointment} doctor={doctor} />
@@ -458,7 +466,11 @@ const AppointmentPage = () => {
                 deleteComment={deleteComment}
               />
             </ColumnLayout>
-            <ChatHistory>
+            <ChatHistory
+              style={{
+                height: "calc(100vh - 200px - 60px)",
+              }}
+            >
               <CardTitle>Chat Logs</CardTitle>
               {!chatLogs && <span>Loading chat log</span>}
               {chatLogs &&

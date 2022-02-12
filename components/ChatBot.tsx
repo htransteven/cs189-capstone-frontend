@@ -476,7 +476,7 @@ export const ChatBot = () => {
   if (typeof window === "undefined") return null;
 
   return ReactDOM.createPortal(
-    <Wrapper>
+    <Wrapper style={{ zIndex: isOpen ? 1000 : -1 }}>
       <LexClientProvider>
         <ChatWindow isOpen={isOpen} magnify={magnify} ref={containerRef}>
           <ChatForm
@@ -492,7 +492,7 @@ export const ChatBot = () => {
                   Reset
                 </ResetChatButton>
                 <ExpandChatButton onClick={() => setMagnify((prev) => !prev)}>
-                  Expand
+                  {magnify ? "Collapse" : "Expand"}
                 </ExpandChatButton>
               </ChatWindowControls>
             </ChatFormHeader>
