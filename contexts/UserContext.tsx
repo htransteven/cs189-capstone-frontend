@@ -15,7 +15,13 @@ export const useRole = (): Role => {
   const user = useContext(UserContext);
   if (!user) return null;
 
-  const role: string = user["https://myapp/role"][0];
+  const roles = user["https://myapp/role"] as string[];
+  let role;
+  if (roles.includes("doctor")) {
+    role = "doctor";
+  } else {
+    role = roles[0];
+  }
 
   switch (role && role.toLowerCase()) {
     case "patient":
