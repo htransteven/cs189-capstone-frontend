@@ -4,6 +4,12 @@ import { UserProvider } from "../contexts/UserContext";
 import { ApiProvider } from "../contexts/APIClientContext";
 import { createGlobalStyle } from "styled-components";
 import { pallete } from "../styles";
+import "@fullcalendar/common/main.css";
+import "@fullcalendar/daygrid/main.css";
+import "@fullcalendar/timegrid/main.css";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/themes/light.css";
+import "tippy.js/themes/light-border.css";
 
 const GlobalStyle = createGlobalStyle`
 html{

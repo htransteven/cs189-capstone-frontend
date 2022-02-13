@@ -1,24 +1,30 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { format, fromUnixTime } from "date-fns";
-import Link from "next/link";
+import { format, formatISO, fromUnixTime } from "date-fns";
+import Tippy from "@tippyjs/react";
 import React, { useEffect, useState } from "react";
 import { Appointment, Doctor, Patient } from "../../api-utils/models";
 import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
 import Tag from "../../components/Tag";
 import Navbar from "../../components/Navbar";
+import FullCalendar from "@fullcalendar/react";
+import interactionPlugin from "@fullcalendar/interaction";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import styled from "styled-components";
+import { pallete } from "../../styles";
 
-export const AppointmentCard: React.FC<Appointment> = ({
+const Wrapper = styled.div`
+  padding: 30px;
+  height: calc(100vh - 200px - 60px);
+`;
+
+const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
-  appointment_time,
   patient_id,
-  doctor_id,
 }) => {
   const apiClient = useApi();
-  const role = useRole();
 
   const [loading, setLoading] = useState(false);
-  const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [patient, setPatient] = useState<Patient | null>(null);
 
   useEffect(() => {
@@ -32,104 +38,56 @@ export const AppointmentCard: React.FC<Appointment> = ({
       } else {
         setPatient(pat);
       }
-
-      const doc = await apiClient.doctors.get(doctor_id);
-      if (!doc) {
-        alert(
-          `no doc found for appointment ${appointment_id} with doctor id = ${doctor_id}`
-        );
-      } else {
-        setDoctor(doc);
-      }
       setLoading(false);
     };
 
     getPatientAndDoctor();
-  }, [apiClient, appointment_id, patient_id, doctor_id]);
-
-  console.log(patient);
+  }, [apiClient, appointment_id, patient_id]);
 
   return (
-    <div className='w-full sm:w-1/2 md:w-1/2 xl:w-1/4 p-4'>
-      <Link href={`/${role}/appointments/${appointment_id}`}>
-        <a
-          href=''
-          className='block bg-white shadow-md hover:shadow-xl rounded-lg overflow-hidden h-auto'
-        >
-          <header className='font-bold bg-purple-800 h-16 justify-center'>
-            <div className='flex justify-center pt-1'>
-              <h2 className='font-bold text-white'>
-                Appointment #{appointment_id}
-              </h2>
+    <Tippy
+      theme='light-border'
+      content={
+        <>
+          {!loading && !patient && "No patient data..."}
+          {loading && "Loading patient data..."}
+          {patient && (
+            <div
+              className='items-center justify-items-center w-full whitespace-nowrap'
+              style={{
+                display: "grid",
+                gridAutoFlow: "column",
+                gridGap: "5px",
+                padding: "5px",
+              }}
+            >
+              {patient.preexisting_conditions.map((condition, index) => (
+                <Tag
+                  key={`pe-${index}-${condition.id}`}
+                  text={condition.name}
+                  background='bg-gray-200'
+                  textColor='text-gray-700'
+                />
+              ))}
             </div>
-            <div className='flex justify-center pt-1'>
-              <h2 className='font-bold text-white'>
-                {format(
-                  fromUnixTime(appointment_time),
-                  "EEEE, MM/dd/yyyy @ hh:mm a"
-                )}
-              </h2>
-            </div>
-          </header>
-          <div className='p-4'>
-            <div className='flex flex-col'>
-              <p className='text-purple-700 text-bold'>Location</p>
-              <p className='text-sm'>
-                {loading && "Loading doctor data..."}
-                {!loading && !doctor && "Failed when finding doctor..."}
-                {doctor &&
-                  `${doctor.location.address_line1} ${doctor.location.address_line2}, ${doctor.location.city}, ${doctor.location.state} ${doctor.location.postal_code}`}
-              </p>
-            </div>
-            <div className='mt-3 flex flex-col'>
-              {loading && "Loading patient data..."}
-              {!loading && !patient && "Failed when finding patient data..."}
-              {patient && (
-                <>
-                  <p className='text-purple-700 text-bold'>
-                    Patient Information
-                  </p>
-                  <div className='inline-flex'>
-                    <p className='text-sm text-gray-600 pr-1'>Name: </p>
-                    <p className='text-sm'>
-                      {patient.first_name} {patient.last_name}
-                    </p>
-                  </div>
-                  <div className='inline-flex'>
-                    <p className='text-sm text-gray-600 pr-1'>Birthday: </p>
-                    <p className='text-sm'>
-                      {format(fromUnixTime(patient.birthday), "MM/dd/yyyy")}
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <p className='text-purple-700 text-bold mt-3'>Tags</p>
-            {loading && "Loading patient data..."}
-            {!loading && !patient && "Failed when finding patient data..."}
-            {patient && (
-              <div className='flex'>
-                <div className='flex flex-wrap mt-1'>
-                  {patient.preexisting_conditions.map((condition, index) => (
-                    <Tag
-                      key={`pe-${index}-${condition.id}`}
-                      text={condition.name}
-                      background='bg-gray-200'
-                      textColor='text-gray-700'
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className='p-4 border-t border-b text-xs text-gray-700'>
-            <span className='flex items-center'>See Report</span>
-          </div>
-        </a>
-      </Link>
-    </div>
+          )}
+        </>
+      }
+      placement={"bottom"}
+    >
+      <span
+        style={{
+          display: "flex",
+          padding: "5px",
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        {!loading && !patient && "No patient data..."}
+        {loading && "Loading patient data..."}
+        {patient && `${patient.first_name} ${patient.last_name}`}
+      </span>
+    </Tippy>
   );
 };
 
@@ -160,19 +118,45 @@ const DoctorHomePage = () => {
   return (
     <>
       <Navbar />
-      <div className='container mx-auto'>
-        <div className='flex flex-wrap -mx-4'>
-          {loading && "Loading appointments..."}
-          {!loading && !appointments && "No appointment data found"}
-          {appointments &&
-            appointments.map((appointment) => (
-              <AppointmentCard
-                key={`appointment-${appointment.appointment_id}`}
-                {...appointment}
-              />
-            ))}
-        </div>
-      </div>
+      <Wrapper>
+        {loading && "Loading appointments..."}
+        {!loading && !appointments && "No appointment data found"}
+        {appointments && (
+          <FullCalendar
+            plugins={[timeGridPlugin, interactionPlugin]}
+            editable
+            selectable
+            height={"100%"}
+            eventBackgroundColor={"#6366f1"}
+            eventTextColor={pallete.white}
+            events={appointments.map((appointment) => {
+              const event = {
+                id: appointment.appointment_id,
+                title: `Appointment #${appointment.appointment_id}`,
+                date: formatISO(
+                  fromUnixTime(appointment.appointment_time / 1000)
+                ),
+                startStr: formatISO(
+                  fromUnixTime(appointment.appointment_time / 1000)
+                ),
+                endStr: formatISO(
+                  fromUnixTime(appointment.appointment_time / 1000 + 60 * 60)
+                ),
+                url: `/${role}/appointments/${appointment.appointment_id}`,
+                extendedProps: {
+                  appointment_id: appointment.appointment_id,
+                  patient_id: appointment.patient_id,
+                },
+              };
+              return event;
+            })}
+            eventContent={(eventInfo) => (
+              <AppointmentCard {...eventInfo.event.extendedProps} />
+            )}
+            eventClick={(info) => console.log(info)}
+          />
+        )}
+      </Wrapper>
     </>
   );
 };

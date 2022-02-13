@@ -11,13 +11,13 @@ const DashboardPage = () => {
   switch (role) {
     case "doctor":
       router.push("/doctor");
-      break;
+      return null;
     case "patient":
       router.push("/patient");
-      break;
+      return null;
     case "register":
       router.push("/registration");
-      break;
+      return null;
     default:
       return <Login />;
   }
