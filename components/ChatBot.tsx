@@ -11,7 +11,7 @@ import { LexClientProvider, useLexClient } from "../contexts/LexClientContext";
 import { format } from "date-fns";
 import { useUser } from "../contexts/UserContext";
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ isOpen: boolean }>`
   position: absolute;
   bottom: 30px;
   right: 30px;
@@ -19,13 +19,15 @@ const Wrapper = styled.div`
   flex-flow: row nowrap;
   align-items: flex-end;
   justify-content: flex-end;
-  width: calc(100vw - 60px);
-  height: calc(100vh - 60px);
+  width: ${({ isOpen }) => (isOpen ? "calc(100vw - 60px)" : "0px")};
+  height: ${({ isOpen }) => (isOpen ? "calc(100vh - 60px)" : "0px")};
 `;
 
 const Button = styled.div<{ isOpen: boolean }>`
   height: 60px;
+  min-height: 60px;
   width: 60px;
+  min-width: 60px;
   background-color: ${pallete.purple};
   border-radius: ${({ isOpen }) => (isOpen ? "50% 50% 50% 0" : "50%")};
   color: ${pallete.white};
@@ -476,7 +478,7 @@ export const ChatBot = () => {
   if (typeof window === "undefined") return null;
 
   return ReactDOM.createPortal(
-    <Wrapper style={{ zIndex: isOpen ? 1000 : -1 }}>
+    <Wrapper isOpen={isOpen}>
       <LexClientProvider>
         <ChatWindow isOpen={isOpen} magnify={magnify} ref={containerRef}>
           <ChatForm
