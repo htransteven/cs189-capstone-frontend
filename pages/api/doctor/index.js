@@ -1,10 +1,8 @@
 const putDatabaseInfo = require("../../../api-utils/database");
-const configureDatabase = require("../../../api-utils/configure_database");
-var ddb = configureDatabase();
 
 export default function handler(req, res) {
-  const table_name = "appointments";
   if (req.method === "POST" || req.method === "PUT") {
+    const table_name = "doctors";
     const body = JSON.parse(req.body);
     putDatabaseInfo(table_name, body);
     res.status(200).json(body);
