@@ -131,7 +131,7 @@ const DoctorHomePage = () => {
             eventTextColor={pallete.white}
             events={appointments.map((appointment) => {
               const event = {
-                id: appointment.appointment_id,
+                id: `${appointment.appointment_id}`,
                 title: `Appointment #${appointment.appointment_id}`,
                 date: formatISO(
                   fromUnixTime(appointment.appointment_time / 1000)
@@ -151,7 +151,9 @@ const DoctorHomePage = () => {
               return event;
             })}
             eventContent={(eventInfo) => (
-              <AppointmentCard {...eventInfo.event.extendedProps} />
+              <AppointmentCard
+                {...(eventInfo.event.extendedProps as Appointment)}
+              />
             )}
             eventClick={(info) => console.log(info)}
           />
