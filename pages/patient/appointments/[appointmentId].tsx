@@ -173,11 +173,15 @@ const AppointmentInfo: React.FC<Appointment & { doctor: Doctor }> = ({
       <RowLayout gap={20}>
         <RowLayout pair={true}>
           <Label>Date</Label>
-          <Value>{format(fromUnixTime(appointment_time), "MM/dd/yyyy")}</Value>
+          <Value>
+            {format(fromUnixTime(appointment_time / 1000), "MM/dd/yyyy")}
+          </Value>
         </RowLayout>
         <RowLayout pair={true}>
           <Label>Time</Label>
-          <Value>{format(fromUnixTime(appointment_time), "hh:mm:ss a")}</Value>
+          <Value>
+            {format(fromUnixTime(appointment_time / 1000), "hh:mm:ss a")}
+          </Value>
         </RowLayout>
       </RowLayout>
       <RowLayout pair={true}>
