@@ -129,6 +129,7 @@ const DoctorHomePage = () => {
             height={"100%"}
             eventBackgroundColor={"#6366f1"}
             eventTextColor={pallete.white}
+            timeZone={"UTC"}
             events={appointments.map((appointment) => {
               const event = {
                 id: `${appointment.appointment_id}`,
