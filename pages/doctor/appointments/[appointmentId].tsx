@@ -15,6 +15,7 @@ import { pallete } from "../../../styles";
 import { format, fromUnixTime, getUnixTime } from "date-fns";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { ChatMessage } from "../../../components";
+import { formatInTimeZone } from "date-fns-tz";
 
 const Banner = styled.div`
   background-color: ${pallete.purple};
@@ -174,13 +175,21 @@ const AppointmentInfo: React.FC<Appointment & { doctor: Doctor }> = ({
         <RowLayout pair={true}>
           <Label>Date</Label>
           <Value>
-            {format(fromUnixTime(appointment_time / 1000), "MM/dd/yyyy")}
+            {formatInTimeZone(
+              fromUnixTime(appointment_time / 1000),
+              "UTC",
+              "MM/dd/yyyy"
+            )}
           </Value>
         </RowLayout>
         <RowLayout pair={true}>
           <Label>Time</Label>
           <Value>
-            {format(fromUnixTime(appointment_time / 1000), "hh:mm:ss a")}
+            {formatInTimeZone(
+              fromUnixTime(appointment_time / 1000),
+              "UTC",
+              "hh:mm:ss a"
+            )}
           </Value>
         </RowLayout>
       </RowLayout>

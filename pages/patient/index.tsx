@@ -8,6 +8,7 @@ import Navbar from "../../components/Navbar";
 import { format, fromUnixTime } from "date-fns";
 import Tag from "../../components/Tag";
 import Link from "next/link";
+import { formatInTimeZone } from "date-fns-tz";
 
 export const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
@@ -65,8 +66,9 @@ export const AppointmentCard: React.FC<Appointment> = ({
             </div>
             <div className='flex justify-center pt-1'>
               <h2 className='font-bold text-white'>
-                {format(
+                {formatInTimeZone(
                   fromUnixTime(appointment_time / 1000),
+                  "UTC",
                   "EEEE, MM/dd/yyyy @ hh:mm a"
                 )}
               </h2>

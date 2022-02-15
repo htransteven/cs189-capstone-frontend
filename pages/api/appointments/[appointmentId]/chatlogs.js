@@ -15,10 +15,10 @@ export default async function handler(req, res) {
           queryString: `fields @timestamp, @message
                 | sort @timestamp desc
                 | filter slots.AppointmentNumber = ${appointmentId}
-                | limit 10`,
-          startTime: new Date("2021-09-12").getTime(),
-          endTime: new Date().getTime(),
-          limit: 10,
+                | limit 100`,
+          startTime: new Date("2021-09-12").getTime() / 1000,
+          endTime: new Date().getTime() / 1000,
+          limit: 100,
         },
         (err, data) => {
           const id = setInterval(() => {
@@ -35,21 +35,21 @@ export default async function handler(req, res) {
                 let length = response.results.length;
                 for (let i = length - 1; i >= 0; i--) {
                   //Give to Frontend:This console log gives the date/timestamp of the log (ex.2022-01-11 20:38:44.087)
-                  console.log("Timestamp:");
+                  //console.log("Timestamp:");
                   var the_res = response.results[i][0].value;
                   the_res = the_res.replace(" ", "T");
-                  console.log(getUnixTime(parseJSON(the_res)));
+                  //console.log(getUnixTime(parseJSON(the_res)));
 
                   const text = String(response.results[i][1].value);
                   const obj = JSON.parse(text);
 
                   //Give to Frontend:This console log gives the user-input/message to the bot
-                  console.log("User Input:");
-                  console.log(obj.inputTranscript);
+                  //console.log("User Input:");
+                  //console.log(obj.inputTranscript);
 
                   //Give to Frontend:This console log gives the user-input/message to the bot
-                  console.log("Bot Response:");
-                  console.log(obj.botResponse);
+                  //console.log("Bot Response:");
+                  //console.log(obj.botResponse);
 
                   const ret = {
                     timestamp: getUnixTime(parseJSON(the_res)),

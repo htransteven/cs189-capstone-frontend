@@ -86,9 +86,11 @@ export const createClient = (): APIClient => {
           }
         );
 
+        //console.log(res.data);
         if (res.statusText !== "Created") {
           return null;
         }
+        //console.log(patient);
         if (res.data.message === "successfully registered") {
           const res = await axios.post("/api/patient", patient);
 
