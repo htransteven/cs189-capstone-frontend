@@ -362,7 +362,7 @@ export const ChatBot = () => {
 
     setChatHistory([
       {
-        message: `Hello and welcome to Scribe!\nYour chat session ID is #${userId}.\nHow may I help you?`,
+        message: `Hello and welcome to BRAD!\nYour chat session ID is #${userId}.\nHow may I help you?`,
         sender: "bot",
         timestamp: Date.now(),
       },
@@ -488,7 +488,7 @@ export const ChatBot = () => {
             }}
           >
             <ChatFormHeader>
-              <span>Scribe Chat Bot</span>
+              <span>BRAD Chat Bot</span>
               <ChatWindowControls>
                 <ResetChatButton onClick={handleResetButtonClick}>
                   Reset
