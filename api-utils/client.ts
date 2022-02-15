@@ -76,10 +76,7 @@ export const createClient = (): APIClient => {
 
         const patient = await res.json();
 
-        return {
-          ...patient,
-          birthday: parseInt(patient.birthday, 10),
-        } as Patient;
+        return patient as Patient;
       },
       post: async (patient: Patient, picture: string) => {
         const res = await axios.post(

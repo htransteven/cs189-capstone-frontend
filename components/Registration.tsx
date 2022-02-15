@@ -4,6 +4,7 @@ import { useApi } from "../contexts/APIClientContext";
 import { Patient, Condition, Medication } from "../api-utils/models";
 import useSWR from "swr";
 import Modal from "./Modal";
+import { getUnixTime } from "date-fns";
 
 interface infermedicaCondition {
   id: string;
@@ -23,7 +24,7 @@ const Registration = (): ReactElement => {
     first_name: user.name,
     last_name: user.name,
     email: user.email,
-    birthday: -1,
+    birthday: 0,
     sex: "N/A",
     active_medications: [],
     preexisting_conditions: [],
@@ -106,7 +107,7 @@ const Registration = (): ReactElement => {
   };
 
   const submitRegistration = async () => {
-    if (patient.birthday === -1 || patient.sex === "N/A") {
+    if (patient.birthday === 0 || patient.sex === "N/A") {
       setError("Please fill out Birthday and/or Gender before submitting");
     } else {
       const res = await apiClient.patients.post(patient, user.picture);
@@ -160,7 +161,7 @@ const Registration = (): ReactElement => {
             if (selectedDate < currentDate) {
               setPatient({
                 ...patient,
-                birthday: Math.floor(selectedDate.getTime() / 1000),
+                birthday: getUnixTime(selectedDate),
               });
               setError("");
             } else {
