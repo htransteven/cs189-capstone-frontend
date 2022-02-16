@@ -6,7 +6,7 @@ const Navbar = () => {
   const router = useRouter();
 
   return (
-    <div className='min-h-full'>
+    <div>
       <header className='px-5 border-b'>
         <div className='grid grid-cols-6 gap-4 py-4'>
           <h1

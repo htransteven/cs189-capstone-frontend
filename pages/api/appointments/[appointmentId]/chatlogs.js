@@ -15,10 +15,10 @@ export default async function handler(req, res) {
           queryString: `fields @timestamp, @message
                 | sort @timestamp desc
                 | filter slots.AppointmentNumber = ${appointmentId}
-                | limit 100`,
-          startTime: new Date("2021-09-12").getTime() / 1000,
-          endTime: new Date().getTime() / 1000,
-          limit: 100,
+                | limit 20`,
+          startTime: Math.floor(new Date("2021-09-12").getTime() / 1000),
+          endTime: Math.floor(new Date().getTime() / 1000),
+          limit: 20,
         },
         (err, data) => {
           const id = setInterval(() => {
