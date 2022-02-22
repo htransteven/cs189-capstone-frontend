@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Appointment, Doctor, Patient } from "../../api-utils/models";
 import { useApi } from "../../contexts/APIClientContext";
 import { useRole, useUser } from "../../contexts/UserContext";
-import Tag from "../../components/Tag";
+import { Tag, TagContainer } from "../../components/Tag";
 import Navbar from "../../components/Navbar";
 import FullCalendar from "@fullcalendar/react";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -46,30 +46,22 @@ const AppointmentCard: React.FC<Appointment> = ({
 
   return (
     <Tippy
-      theme='light-border'
+      theme="light-border"
       content={
         <>
           {!loading && !patient && "No patient data..."}
           {loading && "Loading patient data..."}
           {patient && (
-            <div
-              className='items-center justify-items-center w-full whitespace-nowrap'
-              style={{
-                display: "grid",
-                gridAutoFlow: "column",
-                gridGap: "5px",
-                padding: "5px",
-              }}
-            >
+            <TagContainer>
               {patient.preexisting_conditions.map((condition, index) => (
                 <Tag
                   key={`pe-${index}-${condition.id}`}
                   text={condition.name}
-                  background='bg-gray-200'
-                  textColor='text-gray-700'
+                  background="bg-gray-200"
+                  textColor="text-gray-700"
                 />
               ))}
-            </div>
+            </TagContainer>
           )}
         </>
       }

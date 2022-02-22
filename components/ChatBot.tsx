@@ -8,8 +8,10 @@ import React, { useState, useRef, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { pallete } from "../styles";
 import { LexClientProvider, useLexClient } from "../contexts/LexClientContext";
-import { format } from "date-fns";
+import { format, fromUnixTime } from "date-fns";
 import { useUser } from "../contexts/UserContext";
+import { Appointment } from "../api-utils/models";
+import { formatInTimeZone } from "date-fns-tz";
 
 const Wrapper = styled.div<{ isOpen: boolean }>`
   position: absolute;
@@ -343,7 +345,11 @@ export const ChatMessage: React.FC<ChatEntry & { magnify: boolean }> = ({
   );
 };
 
-export const ChatBot = () => {
+interface ChatBot {
+  appointments?: Appointment[];
+}
+
+export const ChatBot: React.FC<ChatBot> = ({ appointments }) => {
   const [isOpen, setIsOpen] = useState(false);
   const lexClient = useLexClient();
 
@@ -416,6 +422,7 @@ export const ChatBot = () => {
   };
 
   const sendMessage = async (message = input) => {
+    console.log("send", message);
     if (message.length === 0) return;
 
     setChatHistory((prev) => [
@@ -426,36 +433,75 @@ export const ChatBot = () => {
     const lexParams: PostTextCommandInput = {
       botAlias: process.env.NEXT_PUBLIC_BOT_ALIAS,
       botName: process.env.NEXT_PUBLIC_BOT_NAME,
-      inputText: input,
+      inputText: message,
       userId: `${userId}`,
       sessionAttributes: { userId },
     };
     setThinking(true);
     try {
-      const data: any = await lexClient.send(new PostTextCommand(lexParams));
-      const [mainMessage, lineItems] = data.message.split("\noptions\n");
-      setChatHistory((prev) => {
-        const messageIndex = prev.length;
-        return [
-          ...prev,
-          {
-            message: mainMessage,
-            timestamp: Date.now(),
-            sender: "bot",
-            lineItems: lineItems?.split("\n").map((li: string) => ({
-              value: li,
-              onClick: () => {
-                setChatHistory((prev) => {
-                  const copy = [...prev];
-                  copy[messageIndex].lineItemSelected = true;
-                  return copy;
-                });
-                sendMessage(li.charAt(0));
-              },
-            })),
-          },
-        ];
-      });
+      const data: { message?: string } = await lexClient.send(
+        new PostTextCommand(lexParams)
+      );
+      if (data.message.includes("What is your appointment number?")) {
+        setChatHistory((prev) => {
+          const messageIndex = prev.length;
+          return [
+            ...prev,
+            {
+              message: data.message,
+              timestamp: Date.now(),
+              sender: "bot",
+              lineItems: appointments
+                .filter((appt) => {
+                  return (
+                    appt.appointment_time > Date.now() &&
+                    !appt.initial_diagnosis
+                  );
+                })
+                .map((appt: Appointment) => ({
+                  value: formatInTimeZone(
+                    fromUnixTime(appt.appointment_time / 1000),
+                    "UTC",
+                    "EEEE, MM/dd/yyyy @ hh:mm a"
+                  ),
+                  onClick: () => {
+                    console.log("clicked line item", appt.appointment_id);
+                    sendMessage(`${appt.appointment_id}`);
+                    setChatHistory((prev) => {
+                      const copy = [...prev];
+                      copy[messageIndex].lineItemSelected = true;
+                      return copy;
+                    });
+                  },
+                })),
+            },
+          ];
+        });
+      } else {
+        const [mainMessage, lineItems] = data.message.split("\noptions\n");
+        setChatHistory((prev) => {
+          const messageIndex = prev.length;
+          return [
+            ...prev,
+            {
+              message: mainMessage,
+              timestamp: Date.now(),
+              sender: "bot",
+              lineItems: lineItems?.split("\n").map((li: string) => ({
+                value: li,
+                onClick: () => {
+                  setChatHistory((prev) => {
+                    const copy = [...prev];
+                    copy[messageIndex].lineItemSelected = true;
+                    return copy;
+                  });
+                  sendMessage(li.charAt(0));
+                },
+              })),
+            },
+          ];
+        });
+      }
       //console.log("Success. Response is: ", data.message);
     } catch (err) {
       setChatHistory((prev) => [
