@@ -210,7 +210,7 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
         </select>
       </div>
       <div className="block max-w-lg mx-auto">
-        <strong>Your pre-exisitng conditions</strong>
+        <strong>Your pre-exisiting conditions</strong>
         <div className="mt-2 flex flex-col">
           {patient.preexisting_conditions.map((condition: Condition) => {
             return (
