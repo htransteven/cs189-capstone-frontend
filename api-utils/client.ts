@@ -1,5 +1,5 @@
-import { Appointment, ChatLogs, Doctor, Patient, Role } from './models';
-import axios from 'axios';
+import { Appointment, ChatLogs, Doctor, Patient, Role } from "./models";
+import axios from "axios";
 
 export interface APIClient {
   appointments: {
@@ -59,7 +59,7 @@ export const createClient = (): APIClient => {
       },
       put: async (appointmentId: number, changes: Partial<Appointment>) => {
         const res = await fetch(`/api/appointments/${appointmentId}`, {
-          method: 'PUT',
+          method: "PUT",
           body: JSON.stringify(changes),
         });
         if (!res.ok) {
@@ -91,22 +91,22 @@ export const createClient = (): APIClient => {
             }
           );
 
-          if (res.statusText !== 'Created') {
+          if (res.statusText !== "Created") {
             return null;
           }
-          if (res.data.message === 'successfully registered') {
-            const res = await axios.post('/api/patient', patient);
+          if (res.data.message === "successfully registered") {
+            const res = await axios.post("/api/patient", patient);
 
-            if (res.statusText !== 'OK') {
+            if (res.statusText !== "OK") {
               return null;
             }
 
             return (await res.data) as Patient;
           }
         } else {
-          const res = await axios.post('/api/patient', patient);
+          const res = await axios.post("/api/patient", patient);
 
-          if (res.statusText !== 'OK') {
+          if (res.statusText !== "OK") {
             return null;
           }
 
