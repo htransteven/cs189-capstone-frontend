@@ -2,10 +2,10 @@ import axios from "axios";
 
 export default async function handler(req, res) {
   const { userId } = req.query;
+  // userId does not contain the oauth2| ...
 
   if (req.method === "POST" || req.method === "PUT") {
     const patientRoleId = "rol_IjR1g9ta8kaKJHDD";
-    const { picture } = req.body;
     try {
       const { data } = await axios.post(
         "https://dev-1z3ey38f.us.auth0.com/oauth/token",

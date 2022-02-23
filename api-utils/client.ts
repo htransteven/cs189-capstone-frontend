@@ -13,11 +13,8 @@ export interface APIClient {
   };
   patients: {
     get: (patientId: string) => Promise<Patient | null>;
-    post: (
-      patient: Patient,
-      picture: string,
-      regType: boolean
-    ) => Promise<Patient | null>;
+    setRole: (patient: Patient, picture: string) => Promise<boolean>;
+    post: (patient: Patient) => Promise<Patient | null>;
   };
   doctors: {
     get: (doctorId: string) => Promise<Doctor | null>;
@@ -82,38 +79,26 @@ export const createClient = (): APIClient => {
 
         return patient as Patient;
       },
-      post: async (patient: Patient, picture: string, regType: boolean) => {
-        if (regType) {
-          const res = await axios.post(
-            `/api/registration/${patient.patient_id}`,
-            {
-              picture,
-            }
-          );
+      setRole: async (patient: Patient, picture: string) => {
+        // patient is our model
+        // patient_id does not have google-auth| or auth0|
+        const oAuthUserId = `${
+          picture.includes("google") ? "google-oauth2" : "auth0"
+        }|${patient.patient_id}`;
+        const res = await axios.post(`/api/registration/${oAuthUserId}`);
 
-          if (res.statusText !== "Created") {
-            return null;
-          }
-          if (res.data.message === "successfully registered") {
-            const res = await axios.post("/api/patient", patient);
+        return res.status === 201;
+      },
+      post: async (patient: Patient) => {
+        // patient is our model
+        // patient_id does not have google-auth| or auth0|
+        const resPatient = await axios.post("/api/patient", patient);
 
-            if (res.statusText !== "OK") {
-              return null;
-            }
-
-            return (await res.data) as Patient;
-          }
-        } else {
-          const res = await axios.post("/api/patient", patient);
-
-          if (res.statusText !== "OK") {
-            return null;
-          }
-
-          return (await res.data) as Patient;
+        if (resPatient.status !== 200) {
+          return null;
         }
 
-        return null;
+        return resPatient.data as Patient;
       },
     },
     doctors: {
