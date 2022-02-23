@@ -122,16 +122,19 @@ export const AppointmentCard: React.FC<Appointment> = ({
                     textColor="text-gray-700"
                   />
                 ))}
-                {!initial_diagnosis && (
-                  <Tag
-                    key={`tag-needs-pc`}
-                    text={"Preconsult available"}
-                    background="bg-red-200"
-                    textColor="text-gray-700"
-                  />
-                )}
               </TagContainer>
             )}
+            <div className="mt-3 flex flex-col">
+              <p className="text-purple-700 text-bold">Preconsult Status</p>
+              <div className="inline-flex">
+                <Tag
+                  key={`tag-needs-pc`}
+                  text={initial_diagnosis ? "Completed" : "Incomplete"}
+                  background={initial_diagnosis ? "bg-green-200" : "bg-red-200"}
+                  textColor="text-gray-700"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="p-4 border-t border-b text-xs text-gray-700">
