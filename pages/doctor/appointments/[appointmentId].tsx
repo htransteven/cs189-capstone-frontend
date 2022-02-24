@@ -239,11 +239,33 @@ const AppointmentInfo: React.FC<Appointment & { doctor: Doctor }> = ({
   );
 };
 
-const DiagnosisInfo: React.FC<Appointment> = ({
-  doctor_diagnosis,
-  initial_diagnosis,
-  symptoms,
-}) => {
+const DoctorDiagnosisInput = styled.textarea`
+  height: 100%;
+  width: 100%;
+  border: 2px solid ${pallete.purple};
+  padding: 6px 10px;
+  border-radius: 5px;
+  margin-top: 5px;
+`;
+
+const SaveDiagnosisButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 3px;
+  color: ${pallete.white};
+  background-color: ${pallete.purple};
+  font-size: 0.7rem;
+  margin-top: 10px;
+`;
+
+const DiagnosisInfo: React.FC<
+  Appointment & { onSave: (diagnosis: string) => void }
+> = ({ doctor_diagnosis, initial_diagnosis, symptoms, onSave }) => {
+  const [diagnosis, setDiagnosis] = useState(doctor_diagnosis);
+
   return (
     <Card>
       <CardTitle>Diagnosis Info</CardTitle>
@@ -265,9 +287,22 @@ const DiagnosisInfo: React.FC<Appointment> = ({
             ))}
         </ColumnLayout>
       </RowLayout>
-      <RowLayout pair={true}>
-        <Label>Doctor's Diagnosis</Label>
-        <Value>{doctor_diagnosis}</Value>
+      <RowLayout>
+        <ColumnLayout>
+          <Label>Doctor's Diagnosis</Label>
+          <DoctorDiagnosisInput
+            value={diagnosis}
+            onChange={(e) => setDiagnosis(e.target.value)}
+          />
+          <SaveDiagnosisButton
+            onClick={(e) => {
+              e.preventDefault();
+              onSave(diagnosis);
+            }}
+          >
+            Save Changes
+          </SaveDiagnosisButton>
+        </ColumnLayout>
       </RowLayout>
     </Card>
   );
@@ -420,6 +455,16 @@ const AppointmentPage = () => {
     getAppointment();
   }, [apiClient, appointmentId]);
 
+  const saveDiagnosis = async (diagnosis: string) => {
+    const res = await apiClient.appointments.put(appointment.appointment_id, {
+      ...appointment,
+      doctor_diagnosis: diagnosis,
+    });
+
+    if (!res) return;
+    setAppointment({ ...appointment, ...res });
+  };
+
   const addComment = async (value: string) => {
     const res = await apiClient.appointments.put(appointment.appointment_id, {
       ...appointment,
@@ -471,7 +516,7 @@ const AppointmentPage = () => {
               <RowLayout gap={15}>
                 <PatientInfo {...patient} />
                 <AppointmentInfo {...appointment} doctor={doctor} />
-                <DiagnosisInfo {...appointment} />
+                <DiagnosisInfo {...appointment} onSave={saveDiagnosis} />
               </RowLayout>
               <CommentsSection
                 comments={appointment.comments}
