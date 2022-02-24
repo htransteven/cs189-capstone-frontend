@@ -14,7 +14,7 @@ import Navbar from "../../../components/Navbar";
 import { pallete } from "../../../styles";
 import { format, fromUnixTime, getUnixTime } from "date-fns";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { ChatMessage } from "../../../components";
+import { ChatMessage, Tag, TagContainer } from "../../../components";
 import { formatInTimeZone } from "date-fns-tz";
 
 const Banner = styled.div`
@@ -146,14 +146,19 @@ const PatientInfo: FunctionComponent<Patient> = ({
         <Label>Sex</Label>
         <Value style={{ textTransform: "capitalize" }}>{sex}</Value>
       </RowLayout>
-      <RowLayout pair={true}>
+      <ColumnLayout pair={true}>
         <Label>Pre-existing Conditions</Label>
-        <ColumnLayout gap={10}>
-          {preexisting_conditions.map((condition) => (
-            <Value key={`pe-${condition.id}`}>{condition.name}</Value>
+        <TagContainer>
+          {preexisting_conditions.map((condition, index) => (
+            <Tag
+              key={`pe-${index}-${condition.id}`}
+              text={condition.name}
+              background="bg-gray-200"
+              textColor="text-gray-700"
+            />
           ))}
-        </ColumnLayout>
-      </RowLayout>
+        </TagContainer>
+      </ColumnLayout>
     </Card>
   );
 };
@@ -531,6 +536,7 @@ const AppointmentPage = () => {
             >
               <CardTitle>Chat Logs</CardTitle>
               {!chatLogs && <span>Loading chat log</span>}
+              {chatLogs?.length === 0 && <span>No chat log found</span>}
               {chatLogs &&
                 chatLogs.map((log, index) => (
                   <>

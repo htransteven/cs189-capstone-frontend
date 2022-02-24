@@ -156,6 +156,7 @@ const PatientHome = () => {
 
   useEffect(() => {
     const getAppointments = async () => {
+      if (appointments) return;
       setLoading(true);
       const res = await apiClient.appointments.getAll(user.sub, role);
       setLoading(false);
@@ -168,7 +169,7 @@ const PatientHome = () => {
       setAppointments(res);
     };
     getAppointments();
-  }, [apiClient, user.sub, role]);
+  }, [apiClient, user.sub, role, appointments]);
 
   const filterAppointments = (appointments: Appointment[]): Appointment[] => {
     const currentDate = Date.now();
@@ -219,7 +220,10 @@ const PatientHome = () => {
               />
             ))}
         </div>
-        <ChatBot appointments={appointments} />
+        <ChatBot
+          appointments={appointments}
+          onNewAppointment={() => setAppointments(null)}
+        />
       </div>
     </>
   );

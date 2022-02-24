@@ -347,9 +347,13 @@ export const ChatMessage: React.FC<ChatEntry & { magnify: boolean }> = ({
 
 interface ChatBot {
   appointments?: Appointment[];
+  onNewAppointment: () => void;
 }
 
-export const ChatBot: React.FC<ChatBot> = ({ appointments }) => {
+export const ChatBot: React.FC<ChatBot> = ({
+  appointments,
+  onNewAppointment,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const lexClient = useLexClient();
 
@@ -478,6 +482,9 @@ export const ChatBot: React.FC<ChatBot> = ({ appointments }) => {
           ];
         });
       } else {
+        if (data.message.includes("Your appointment number is")) {
+          onNewAppointment();
+        }
         const [mainMessage, lineItems] = data.message.split("\noptions\n");
         setChatHistory((prev) => {
           const messageIndex = prev.length;
