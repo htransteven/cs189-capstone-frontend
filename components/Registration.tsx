@@ -1,10 +1,11 @@
-import React, { ReactElement, useEffect, useState } from "react";
-import { useUser } from "@auth0/nextjs-auth0";
-import { useApi } from "../contexts/APIClientContext";
-import { Patient, Condition, Medication } from "../api-utils/models";
-import useSWR from "swr";
-import Modal from "./Modal";
-import { format, fromUnixTime, getUnixTime } from "date-fns";
+import React, { ReactElement, useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0';
+import { useApi } from '../contexts/APIClientContext';
+import { Patient, Condition, Medication } from '../api-utils/models';
+import useSWR from 'swr';
+import Modal from './Modal';
+import { format, fromUnixTime, getUnixTime } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface infermedicaCondition {
   id: string;
@@ -24,30 +25,30 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
   const { user } = useUser();
 
   const emptyMedication: Medication = {
-    name: "",
-    dosage: "",
+    name: '',
+    dosage: '',
     timesPerWeek: 0,
   };
 
-  const { data: infermedicaData } = useSWR("/api/conditions", fetcher);
+  const { data: infermedicaData } = useSWR('/api/conditions', fetcher);
   const [patient, setPatient] = useState<Patient>(initialPatient);
   const [currentMed, setCurrentMed] = useState<Medication>(emptyMedication);
-  const [currentSearch, setCurrentSearch] = useState<string>("");
+  const [currentSearch, setCurrentSearch] = useState<string>('');
   const [searchRes, setSearchRes] = useState<infermedicaCondition[]>([]);
   const [modal, setModal] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const [successSave, setSuccessSave] = useState<boolean>(false);
 
   useEffect(() => {
-    setError("");
+    setError('');
     setSuccessSave(false);
   }, [patient, currentMed, currentSearch, searchRes]);
 
   useEffect(() => {
-    if (currentSearch == "") {
+    if (currentSearch == '') {
       setSearchRes([]);
     }
-    if (infermedicaData && infermedicaData.length > 0 && currentSearch !== "") {
+    if (infermedicaData && infermedicaData.length > 0 && currentSearch !== '') {
       setSearchRes(
         infermedicaData.filter((el: infermedicaCondition) => {
           const searchTerm = currentSearch.toLowerCase();
@@ -70,24 +71,24 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
         ...patient,
         preexisting_conditions: newConditions,
       });
-      setCurrentSearch("");
+      setCurrentSearch('');
     } else {
-      setError("Already added this pre-existing condition");
+      setError('Already added this pre-existing condition');
     }
   };
 
   const addMedication = () => {
     if (
-      currentMed.name === "" ||
-      currentMed.dosage === "" ||
+      currentMed.name === '' ||
+      currentMed.dosage === '' ||
       currentMed.timesPerWeek <= 0 ||
       Number.isNaN(currentMed.timesPerWeek)
     ) {
-      setError("Please fill out all medication fields");
+      setError('Please fill out all medication fields');
     } else if (
       patient.active_medications.some((e) => e.name === currentMed.name)
     ) {
-      setError("Medication already exists in list");
+      setError('Medication already exists in list');
     } else {
       setPatient({
         ...patient,
@@ -98,21 +99,21 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
   };
 
   const submitRegistration = async () => {
-    if (patient.birthday === 0 || patient.sex === "N/A") {
-      setError("Please fill out Birthday and/or Gender before submitting");
+    if (patient.birthday === 0 || patient.sex === 'N/A') {
+      setError('Please fill out Birthday and/or Gender before submitting');
     } else {
       if (regType) {
-        console.log("submitting patient", patient);
+        console.log('submitting patient', patient);
         const roleRes = await apiClient.patients.setRole(patient, user.picture);
         if (!roleRes) {
-          alert("failed to set role");
+          alert('failed to set role');
           return;
         }
       }
 
       const res = await apiClient.patients.post(patient);
       if (!res) {
-        alert("failed to post patient data");
+        alert('failed to post patient data');
         return;
       }
 
@@ -123,6 +124,8 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
       }
     }
   };
+
+  console.log(patient);
 
   return (
     <div className="container">
@@ -159,7 +162,7 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
               role="button"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
-              onClick={() => setError("")}
+              onClick={() => setError('')}
             >
               <title>Close</title>
               <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
@@ -172,8 +175,12 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
         <input
           defaultValue={
             regType
-              ? ""
-              : format(fromUnixTime(initialPatient.birthday), "yyyy-MM-dd")
+              ? ''
+              : formatInTimeZone(
+                  fromUnixTime(initialPatient.birthday),
+                  'UTC',
+                  'yyyy-MM-dd'
+                )
           }
           type="date"
           onChange={(e) => {
@@ -185,7 +192,7 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
                 birthday: getUnixTime(selectedDate),
               });
             } else {
-              setError("Please select date in the past");
+              setError('Please select date in the past');
             }
           }}
           className="
@@ -214,7 +221,7 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
                     shadow-sm
                     focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50
                   "
-          defaultValue={regType ? "Select" : initialPatient.sex}
+          defaultValue={regType ? 'Select' : initialPatient.sex}
         >
           <option disabled>Select</option>
           <option>Male</option>
@@ -400,7 +407,7 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
           className="mx-auto mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-400 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
           onClick={submitRegistration}
         >
-          {regType ? "Register" : "Save"}
+          {regType ? 'Register' : 'Save'}
         </button>
       </div>
     </div>
