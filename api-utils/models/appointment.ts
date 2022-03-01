@@ -35,5 +35,5 @@ export interface Appointment {
   symptoms: Symptom[];
   initial_diagnosis: string[];
   doctor_diagnosis: string;
-  tags: Tag[];
+  tags?: Tag[];
 }

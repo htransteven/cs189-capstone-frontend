@@ -116,7 +116,7 @@ export const AppointmentCard: React.FC<Appointment> = ({
             {patient && (
               <TagContainer>
                 {tags
-                  .filter((tag) => tag.source === "pc" || tag.source === "s")
+                  ?.filter((tag) => tag.source === "pc" || tag.source === "s")
                   .map((tag, index) => (
                     <Tag
                       key={`tag-${index}-${tag.value}`}
