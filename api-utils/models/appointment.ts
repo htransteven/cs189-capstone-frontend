@@ -1,5 +1,10 @@
 import { Role } from "./misc";
 
+export interface Tag {
+  value: string;
+  source: string;
+}
+
 export interface ChatLogs {
   timestamp: number;
   input: string;
@@ -30,4 +35,5 @@ export interface Appointment {
   symptoms: Symptom[];
   initial_diagnosis: string[];
   doctor_diagnosis: string;
+  tags: Tag[];
 }

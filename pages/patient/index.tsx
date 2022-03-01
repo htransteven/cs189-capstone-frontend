@@ -16,6 +16,7 @@ export const AppointmentCard: React.FC<Appointment> = ({
   patient_id,
   doctor_id,
   initial_diagnosis,
+  tags,
 }) => {
   const apiClient = useApi();
   const role = useRole();
@@ -119,6 +120,14 @@ export const AppointmentCard: React.FC<Appointment> = ({
                     key={`pe-${index}-${condition.id}`}
                     text={condition.name}
                     background="bg-gray-200"
+                    textColor="text-gray-700"
+                  />
+                ))}
+                {tags.map((tag, index) => (
+                  <Tag
+                    key={`tag-${index}-${tag.value}`}
+                    text={tag.value}
+                    background="bg-purple-200"
                     textColor="text-gray-700"
                   />
                 ))}
