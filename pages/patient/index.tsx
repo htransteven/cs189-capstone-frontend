@@ -121,6 +121,13 @@ export const AppointmentCard: React.FC<Appointment> = ({
               <TagContainer>
                 {tags
                   ?.filter((tag) => tag.source === "pc" || tag.source === "s")
+                  .filter((tag, index) => {
+                    return (
+                      tags.findIndex(
+                        (a) => tag.source === a.source && tag.value === a.value
+                      ) === index
+                    );
+                  })
                   .map((tag, index) => (
                     <Tag
                       key={`tag-${index}-${tag.value}`}

@@ -253,9 +253,17 @@ const DiagnosisInfo: React.FC<Appointment> = ({
         <Label>Symptoms</Label>
         <ColumnLayout gap={10}>
           {symptoms &&
-            symptoms.map((symptoms) => (
-              <Value key={`symp-${symptoms.id}`}>{symptoms.label}</Value>
-            ))}
+            symptoms
+              .filter((symp, index) => {
+                return (
+                  symptoms.findIndex(
+                    (a) => symp.id === a.id && symp.label === a.label
+                  ) === index
+                );
+              })
+              .map((symptoms) => (
+                <Value key={`symp-${symptoms.id}`}>{symptoms.label}</Value>
+              ))}
         </ColumnLayout>
       </RowLayout>
       <RowLayout pair={true}>

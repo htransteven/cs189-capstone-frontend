@@ -54,16 +54,24 @@ const AppointmentCard: React.FC<Appointment> = ({
           {loading && "Loading patient data..."}
           {patient && (
             <TagContainer>
-              {tags?.map((tag, index) => (
-                <Tag
-                  key={`tag-${index}-${tag.value}`}
-                  text={tag.value}
-                  background={
-                    tag.source === "pc" ? "bg-gray-200" : "bg-purple-200"
-                  }
-                  textColor="text-gray-700"
-                />
-              ))}
+              {tags
+                ?.filter((tag, index) => {
+                  return (
+                    tags.findIndex(
+                      (a) => tag.source === a.source && tag.value === a.value
+                    ) === index
+                  );
+                })
+                .map((tag, index) => (
+                  <Tag
+                    key={`tag-${index}-${tag.value}`}
+                    text={tag.value}
+                    background={
+                      tag.source === "pc" ? "bg-gray-200" : "bg-purple-200"
+                    }
+                    textColor="text-gray-700"
+                  />
+                ))}
             </TagContainer>
           )}
         </>

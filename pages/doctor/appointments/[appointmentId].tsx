@@ -280,18 +280,30 @@ const DiagnosisInfo: React.FC<
         <Label>Symptoms</Label>
         <ColumnLayout gap={10}>
           {symptoms &&
-            symptoms.map((symptoms) => (
-              <Value key={`symp-${symptoms.id}`}>{symptoms.label}</Value>
-            ))}
+            symptoms
+              .filter((symp, index) => {
+                return (
+                  symptoms.findIndex(
+                    (a) => symp.id === a.id && symp.label === a.label
+                  ) === index
+                );
+              })
+              .map((symptoms) => (
+                <Value key={`symp-${symptoms.id}`}>{symptoms.label}</Value>
+              ))}
         </ColumnLayout>
       </RowLayout>
       <RowLayout pair={true}>
         <Label>BRAD Diagnosis</Label>
         <ColumnLayout gap={10}>
           {initial_diagnosis &&
-            initial_diagnosis.map((diagnosis, index) => (
-              <Value key={`id-${index}`}>{diagnosis}</Value>
-            ))}
+            initial_diagnosis
+              .filter(
+                (diag, index) => initial_diagnosis.indexOf(diag) === index
+              )
+              .map((diagnosis, index) => (
+                <Value key={`id-${index}`}>{diagnosis}</Value>
+              ))}
         </ColumnLayout>
       </RowLayout>
       <RowLayout>
