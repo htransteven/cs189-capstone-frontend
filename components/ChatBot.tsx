@@ -375,6 +375,30 @@ export const ChatBot: React.FC<ChatBot> = ({
         message: `Hello and welcome to BRAD!\nYour chat session ID is #${userId}.\nHow may I help you?`,
         sender: "bot",
         timestamp: Date.now(),
+        lineItems: [
+          {
+            value: "Schedule a new appointment",
+            onClick: () => {
+              sendMessage(`I'd like to schedule an appointment`);
+              setChatHistory((prev) => {
+                const copy = [...prev];
+                copy[0].lineItemSelected = true;
+                return copy;
+              });
+            },
+          },
+          {
+            value: "Complete a pre-consultation",
+            onClick: () => {
+              sendMessage(`I'd like to do a pre-consult`);
+              setChatHistory((prev) => {
+                const copy = [...prev];
+                copy[0].lineItemSelected = true;
+                return copy;
+              });
+            },
+          },
+        ],
       },
     ]);
   }, [isOpen, chatHistory, userId]);
@@ -483,6 +507,8 @@ export const ChatBot: React.FC<ChatBot> = ({
         });
       } else {
         if (data.message.includes("Your appointment number is")) {
+          onNewAppointment();
+        } else if (data.message.includes("Thanks for completing")) {
           onNewAppointment();
         }
         const [mainMessage, lineItems] = data.message.split("\noptions\n");

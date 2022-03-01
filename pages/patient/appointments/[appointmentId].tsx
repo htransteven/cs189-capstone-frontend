@@ -140,7 +140,9 @@ const PatientInfo: FunctionComponent<Patient> = ({
       </RowLayout>
       <RowLayout pair={true}>
         <Label>Birthday</Label>
-        <Value>{format(fromUnixTime(birthday), "MM/dd/yyyy")}</Value>
+        <Value>
+          {formatInTimeZone(fromUnixTime(birthday), "UTC", "MM/dd/yyyy")}
+        </Value>
       </RowLayout>
       <RowLayout pair={true}>
         <Label>Sex</Label>

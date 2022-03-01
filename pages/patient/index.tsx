@@ -103,7 +103,11 @@ export const AppointmentCard: React.FC<Appointment> = ({
                   <div className="inline-flex">
                     <p className="text-sm text-gray-600 pr-1">Birthday: </p>
                     <p className="text-sm">
-                      {format(fromUnixTime(patient.birthday), "MM/dd/yyyy")}
+                      {formatInTimeZone(
+                        fromUnixTime(patient.birthday),
+                        "UTC",
+                        "MM/dd/yyyy"
+                      )}
                     </p>
                   </div>
                 </>

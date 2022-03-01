@@ -140,7 +140,9 @@ const PatientInfo: FunctionComponent<Patient> = ({
       </RowLayout>
       <RowLayout pair={true}>
         <Label>Birthday</Label>
-        <Value>{format(fromUnixTime(birthday), "MM/dd/yyyy")}</Value>
+        <Value>
+          {formatInTimeZone(fromUnixTime(birthday), "UTC", "MM/dd/yyyy")}
+        </Value>
       </RowLayout>
       <RowLayout pair={true}>
         <Label>Sex</Label>
@@ -284,7 +286,7 @@ const DiagnosisInfo: React.FC<
         </ColumnLayout>
       </RowLayout>
       <RowLayout pair={true}>
-        <Label>Initial Diagnosis</Label>
+        <Label>BRAD Diagnosis</Label>
         <ColumnLayout gap={10}>
           {initial_diagnosis &&
             initial_diagnosis.map((diagnosis, index) => (
