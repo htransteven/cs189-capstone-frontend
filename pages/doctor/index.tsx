@@ -21,6 +21,7 @@ const Wrapper = styled.div`
 const AppointmentCard: React.FC<Appointment> = ({
   appointment_id,
   patient_id,
+  tags,
 }) => {
   const apiClient = useApi();
 
@@ -53,11 +54,13 @@ const AppointmentCard: React.FC<Appointment> = ({
           {loading && "Loading patient data..."}
           {patient && (
             <TagContainer>
-              {patient.preexisting_conditions.map((condition, index) => (
+              {tags?.map((tag, index) => (
                 <Tag
-                  key={`pe-${index}-${condition.id}`}
-                  text={condition.name}
-                  background="bg-gray-200"
+                  key={`tag-${index}-${tag.value}`}
+                  text={tag.value}
+                  background={
+                    tag.source === "pc" ? "bg-gray-200" : "bg-purple-200"
+                  }
                   textColor="text-gray-700"
                 />
               ))}
@@ -139,6 +142,7 @@ const DoctorHomePage = () => {
                 extendedProps: {
                   appointment_id: appointment.appointment_id,
                   patient_id: appointment.patient_id,
+                  tags: appointment.tags,
                 },
               };
               return event;

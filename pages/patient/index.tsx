@@ -115,22 +115,18 @@ export const AppointmentCard: React.FC<Appointment> = ({
             {!loading && !patient && "Failed when finding patient data..."}
             {patient && (
               <TagContainer>
-                {patient.preexisting_conditions.map((condition, index) => (
-                  <Tag
-                    key={`pe-${index}-${condition.id}`}
-                    text={condition.name}
-                    background="bg-gray-200"
-                    textColor="text-gray-700"
-                  />
-                ))}
-                {tags.map((tag, index) => (
-                  <Tag
-                    key={`tag-${index}-${tag.value}`}
-                    text={tag.value}
-                    background="bg-purple-200"
-                    textColor="text-gray-700"
-                  />
-                ))}
+                {tags
+                  .filter((tag) => tag.source === "pc" || tag.source === "s")
+                  .map((tag, index) => (
+                    <Tag
+                      key={`tag-${index}-${tag.value}`}
+                      text={tag.value}
+                      background={
+                        tag.source === "pc" ? "bg-gray-200" : "bg-purple-200"
+                      }
+                      textColor="text-gray-700"
+                    />
+                  ))}
               </TagContainer>
             )}
             <div className="mt-3 flex flex-col">
