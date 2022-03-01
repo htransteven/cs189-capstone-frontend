@@ -210,7 +210,7 @@ const Registration = ({ initialPatient, regType }: Props): ReactElement => {
         <strong className="text-gray-800">Gender</strong>
         <select
           onChange={(e) => {
-            setPatient({ ...patient, sex: e.target.value });
+            setPatient({ ...patient, sex: e.target.value.toLowerCase() });
           }}
           className="
                     block
